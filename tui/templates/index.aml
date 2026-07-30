@@ -1,7 +1,1 @@
-// templates/index.aml
-align [alignment: "center"]
-    border
-        vstack
-            text [foreground: "yellow"] "You"
-            text [foreground: "red"] "are"
-            text [foreground: "blue"] "great!"
+@top_nav
