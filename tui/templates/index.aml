@@ -1,3 +1,44 @@
-vstack
-	@top_nav
-	@message_history
+hstack
+	expand [factor: 5]
+		vstack
+			border [sides: "bottom"]
+				expand [axis: "horz"]
+					hstack
+						text "BB AI"
+						padding [left: 5]
+							text "/Users/brooks/Desktop/grounded"
+			expand
+				vstack
+					hstack
+						spacer
+						border [border_style: "rounded"]
+							text "first message from the user"
+					text "response from the llm"
+					spacer
+					border [sides: "top"]
+						expand [axis: "horz"]
+							text "> This is my prompt"
+	expand 
+		border [sides: "left"]
+			expand [axis: "vert"]
+				vstack
+					border [sides: "bottom"]
+						expand [axis: "horz"]
+							hstack
+								spacer
+								text "Session"
+								spacer
+					text [text_align: "center"] "Tokens: 0"
+					text "Cost: $0.00"
+					text "Model: ----"
+					padding [top: 1]
+						border [sides: "bottom"]
+							expand [axis: "horz"]
+								hstack
+									spacer
+									text "Log"
+									spacer
+					text "Query: first message..."
+					padding [top: 1]
+						text "Response: response from..."
+

@@ -1,3 +1,0 @@
-border [sides: "bottom"]
-	expand [axis: "horz"]
-		text "BB AI"

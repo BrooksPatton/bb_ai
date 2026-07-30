@@ -1,5 +1,0 @@
-border [sides: ["left", "right", "bottom"]]
-	expand [axis: "horz"]
-		vstack
-			spacer
-			text "Message History"
