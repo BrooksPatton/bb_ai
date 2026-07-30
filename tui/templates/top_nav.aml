@@ -1,4 +1,3 @@
 border [sides: "bottom"]
 	expand [axis: "horz"]
-		padding [left: 2]
-			text "BB AI"
+		text "BB AI"

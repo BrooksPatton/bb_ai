@@ -1,1 +1,3 @@
-@top_nav
+vstack
+	@top_nav
+	@message_history

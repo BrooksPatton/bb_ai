@@ -19,7 +19,11 @@ fn main() -> Result<()> {
     builder
         .default::<()>("index", "templates/index.aml")
         .unwrap();
+
+    builder.template("message_history", "templates/message_history.aml")?;
+
     builder.component(top_nav::NAME, "templates/top_nav.aml", TopNav, ())?;
+
     builder
         .finish(&mut backend, |runtime, backend| runtime.run(backend))
         .unwrap();
