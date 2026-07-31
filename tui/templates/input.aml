@@ -1,0 +1,4 @@
+border [sides: ["top", "bottom", "left"]]
+	hstack
+		text "> this is the input prompt"
+		spacer

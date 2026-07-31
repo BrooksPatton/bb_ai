@@ -3,6 +3,7 @@ use anathema::prelude::{Backend, Document, TuiBackend};
 use anathema::runtime::Runtime;
 use eyre::Result;
 use tui::app::{App, AppState};
+use tui::components::input::{Input, InputState};
 
 fn main() -> Result<()> {
     let doc = Document::new("@app");
@@ -18,6 +19,8 @@ fn main() -> Result<()> {
     let mut builder = Runtime::builder(doc, &backend);
 
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;
+
+    builder.prototype("input", "templates/input.aml", || Input, InputState::new)?;
 
     builder
         .finish(&mut backend, |runtime, backend| runtime.run(backend))

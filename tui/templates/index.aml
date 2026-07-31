@@ -18,10 +18,7 @@ hstack
 				text "My first message"
 		text "AI response"
 		spacer
-		border [sides: "top"]
-			hstack
-				text "> Next prompt"
-				spacer
+		@input
 	spacer
 	border [sides: "left", width: 40]
 		vstack
