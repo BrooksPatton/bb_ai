@@ -20,7 +20,7 @@ fn main() -> Result<()> {
 
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;
 
-    builder.prototype("input", "templates/input.aml", || Input, InputState::new)?;
+    builder.prototype("input", "templates/input.aml", Input::new, InputState::new)?;
 
     builder
         .finish(&mut backend, |runtime, backend| runtime.run(backend))

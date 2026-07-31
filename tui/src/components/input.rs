@@ -1,13 +1,34 @@
-use anathema::{component::Component, state::State};
+use anathema::{
+    component::Component,
+    state::{State, Value},
+};
 
-pub struct Input;
+const CURSOR: &str = "|";
+
+pub struct Input {
+    value: String,
+    cursor_pos: usize,
+}
+
+impl Input {
+    pub fn new() -> Self {
+        let value = String::new();
+        let cursor_pos = 0;
+
+        Self { value, cursor_pos }
+    }
+}
 
 #[derive(Debug, State)]
-pub struct InputState {}
+pub struct InputState {
+    value: Value<String>,
+}
 
 impl InputState {
     pub fn new() -> Self {
-        Self {}
+        let value = Value::new(String::from(CURSOR));
+
+        Self { value }
     }
 }
 

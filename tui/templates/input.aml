@@ -1,4 +1,5 @@
-border [sides: ["top", "bottom", "left"]]
+border
 	hstack
-		text "> this is the input prompt"
+		text "> "
+		text state.value
 		spacer
