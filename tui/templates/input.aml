@@ -1,4 +1,9 @@
-border
+let THEME = {
+	focus: {fg: "green"},
+	not_focus: {fg: "grey"},
+}
+
+border [foreground: THEME[state.focus].fg]
 	hstack
 		text "> "
 		text state.value

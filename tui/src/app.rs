@@ -54,6 +54,10 @@ impl Component for App {
     ) {
         self.set_size(context, state);
     }
+
+    fn accept_focus(&self) -> bool {
+        false
+    }
 }
 
 impl App {
