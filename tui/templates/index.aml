@@ -1,44 +1,45 @@
 hstack
-	expand [factor: 5]
+	vstack [width: state.width - 40]
+		border [sides: "bottom"]
+			hstack
+				text "BB AI"
+				padding [left: 5]
+					text state.path
+				padding [left: 5]
+					hstack
+						text "terminal size: "
+						text state.width
+						text " x "
+						text state.height
+				spacer
+		hstack
+			spacer
+			border [border_style: "rounded"]
+				text "My first message"
+		text "AI response"
+		spacer
+		border [sides: "top"]
+			hstack
+				text "> Next prompt"
+				spacer
+	spacer
+	border [sides: "left", width: 40]
 		vstack
 			border [sides: "bottom"]
-				expand [axis: "horz"]
-					hstack
-						text "BB AI"
-						padding [left: 5]
-							text "/Users/brooks/Desktop/grounded"
-			expand
-				vstack
+				hstack
+					spacer
+					text "Session"
+					spacer
+			text "Tokens: 0"
+			text "Cost: $0.00"
+			text "model: -----"
+			padding [top: 1]
+				border [sides: "bottom"]
 					hstack
 						spacer
-						border [border_style: "rounded"]
-							text "first message from the user"
-					text "response from the llm"
-					spacer
-					border [sides: "top"]
-						expand [axis: "horz"]
-							text "> This is my prompt"
-	expand 
-		border [sides: "left"]
-			expand [axis: "vert"]
-				vstack
-					border [sides: "bottom"]
-						expand [axis: "horz"]
-							hstack
-								spacer
-								text "Session"
-								spacer
-					text [text_align: "center"] "Tokens: 0"
-					text "Cost: $0.00"
-					text "Model: ----"
-					padding [top: 1]
-						border [sides: "bottom"]
-							expand [axis: "horz"]
-								hstack
-									spacer
-									text "Log"
-									spacer
-					text "Query: first message..."
-					padding [top: 1]
-						text "Response: response from..."
-
+						text "Log"
+						spacer
+			text "Query: My first..."
+			padding [top: 1]
+				text "Response: Ai response..."
+			spacer

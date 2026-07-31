@@ -2,9 +2,10 @@
 use anathema::prelude::{Backend, Document, TuiBackend};
 use anathema::runtime::Runtime;
 use eyre::Result;
+use tui::app::{App, AppState};
 
 fn main() -> Result<()> {
-    let doc = Document::new("@index");
+    let doc = Document::new("@app");
 
     let mut backend = TuiBackend::builder()
         .enable_alt_screen()
@@ -15,9 +16,8 @@ fn main() -> Result<()> {
     backend.finalize();
 
     let mut builder = Runtime::builder(doc, &backend);
-    builder
-        .default::<()>("index", "templates/index.aml")
-        .unwrap();
+
+    builder.component("app", "templates/index.aml", App, AppState::new()?)?;
 
     builder
         .finish(&mut backend, |runtime, backend| runtime.run(backend))
