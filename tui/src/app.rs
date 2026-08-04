@@ -13,6 +13,7 @@ pub struct AppState {
     width: Value<u16>,
     height: Value<u16>,
     openrouter_key: Value<String>,
+    choosing_model: Value<bool>,
 }
 
 impl AppState {
@@ -25,12 +26,14 @@ impl AppState {
         let width = Value::new(0);
         let height = Value::new(0);
         let openrouter_key = Value::new(String::new());
+        let choosing_model = Value::new(false);
 
         Ok(Self {
             path: Value::new(path),
             width,
             height,
             openrouter_key,
+            choosing_model,
         })
     }
 }
@@ -38,7 +41,7 @@ impl AppState {
 impl Component for App {
     type State = AppState;
 
-    type Message = ();
+    type Message = AppMessage;
 
     fn on_mount(
         &mut self,
@@ -47,7 +50,6 @@ impl Component for App {
         context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         if let Ok(openrouter_key) = std::env::var("OPENROUTER_API_KEY") {
-            println!("{openrouter_key}");
             state.openrouter_key.set(openrouter_key);
         }
 
@@ -66,6 +68,18 @@ impl Component for App {
     fn accept_focus(&self) -> bool {
         false
     }
+
+    fn on_message(
+        &mut self,
+        message: Self::Message,
+        state: &mut Self::State,
+        mut children: anathema::component::Children<'_, '_>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        match message {
+            AppMessage::SlashModel => state.choosing_model.set(true),
+        }
+    }
 }
 
 impl App {
@@ -79,4 +93,8 @@ impl App {
         state.width.set(width);
         state.height.set(height);
     }
+}
+
+pub enum AppMessage {
+    SlashModel,
 }

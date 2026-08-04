@@ -3,6 +3,8 @@ use anathema::{
     state::{State, Value},
 };
 
+use crate::app::AppMessage;
+
 const CURSOR: &str = "|";
 
 pub struct Input {
@@ -62,7 +64,7 @@ impl Component for Input {
         key: anathema::component::KeyEvent,
         state: &mut Self::State,
         mut _children: anathema::component::Children<'_, '_>,
-        mut _context: anathema::component::Context<'_, '_, Self::State>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         match key.code {
             anathema::component::KeyCode::Char(character) => {
@@ -80,9 +82,16 @@ impl Component for Input {
             anathema::component::KeyCode::CtrlC => todo!(),
             anathema::component::KeyCode::Backspace => todo!(),
             anathema::component::KeyCode::Enter => {
+                let value = self.value.iter().collect::<String>();
+
+                if value == "/model" {
+                    let message = AppMessage::SlashModel;
+
+                    context.components.by_name("app").send(message);
+                }
+
                 self.value.clear();
                 self.cursor_pos = 0;
-
                 state.value.set(String::from(CURSOR));
             }
             anathema::component::KeyCode::Left => todo!(),

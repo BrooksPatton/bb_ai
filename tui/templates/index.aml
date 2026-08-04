@@ -1,43 +1,53 @@
-hstack
-	vstack [width: state.width - 40]
-		border [sides: "bottom"]
-			hstack
-				text "BB AI"
-				padding [left: 5]
-					text state.path
-				padding [left: 5]
-					hstack
-						text "terminal size: "
-						text state.width
-						text " x "
-						text state.height
-				spacer
-		hstack
-			spacer
-			border [border_style: "rounded"]
-				text "My first message"
-		text "AI response"
-		spacer
-		@input
-	spacer
-	border [sides: "left", width: 40]
-		vstack
+let CHOOSING_MODAL_THEME = {
+	"true": {fg: "#888888"},
+	"false": {fg: "white"},
+}
+
+zstack
+	hstack [foreground: CHOOSING_MODAL_THEME[to_str(state.choosing_model)].fg ]
+		vstack [width: state.width - 40]
 			border [sides: "bottom"]
 				hstack
+					text "BB AI"
+					padding [left: 5]
+						text state.path
+					padding [left: 5]
+						hstack
+							text "terminal size: "
+							text state.width
+							text " x "
+							text state.height
 					spacer
-					text "Session"
-					spacer
-			text "Tokens: 0"
-			text "Cost: $0.00"
-			text "model: -----"
-			@connection_side [openrouter_key: state.openrouter_key]
-			padding [top: 1]
+			hstack
+				spacer
+				border [border_style: "rounded"]
+					text "My first message"
+			text "AI response"
+			spacer
+			@input
+		spacer
+		border [sides: "left", width: 40]
+			vstack
 				border [sides: "bottom"]
 					hstack
 						spacer
-						text "Log"
+						text "Session"
 						spacer
-			text "Query: My first..."
-			padding [top: 1]
-				text "Response: Ai response..."
-			spacer
+				text "Tokens: 0"
+				text "Cost: $0.00"
+				text "model: -----"
+				@connection_side [openrouter_key: state.openrouter_key]
+				padding [top: 1]
+					border [sides: "bottom"]
+						hstack
+							spacer
+							text "Log"
+							spacer
+				text "Query: My first..."
+				padding [top: 1]
+					text "Response: Ai response..."
+				spacer
+	vstack
+		if state.choosing_model
+			position [placement: "absolute", left: state.width / 2 - 10, bottom: 50]
+				@model_modal

@@ -19,6 +19,7 @@ fn main() -> Result<()> {
     let mut builder = Runtime::builder(doc, &backend);
 
     builder.default::<()>("connection_side", "templates/connections_side.aml")?;
+    builder.default::<()>("model_modal", "templates/model_modal.aml")?;
 
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;
 
