@@ -1,0 +1,14 @@
+vstack
+	padding [top: 1]
+		border [sides: "bottom"]
+			hstack
+				spacer
+				text "Connections"
+				spacer
+	hstack
+		if attributes.openrouter_key
+			text [foreground: "green"] "✔ " 
+		else
+			text [foreground: "red"] "✔ " 
+		text "OpenRouter"
+

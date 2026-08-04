@@ -18,6 +18,8 @@ fn main() -> Result<()> {
 
     let mut builder = Runtime::builder(doc, &backend);
 
+    builder.default::<()>("connection_side", "templates/connections_side.aml")?;
+
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;
 
     builder.prototype("input", "templates/input.aml", Input::new, InputState::new)?;

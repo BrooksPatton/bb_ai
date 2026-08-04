@@ -30,6 +30,7 @@ hstack
 			text "Tokens: 0"
 			text "Cost: $0.00"
 			text "model: -----"
+			@connection_side [openrouter_key: state.openrouter_key]
 			padding [top: 1]
 				border [sides: "bottom"]
 					hstack

@@ -12,6 +12,7 @@ pub struct AppState {
     path: Value<String>,
     width: Value<u16>,
     height: Value<u16>,
+    openrouter_key: Value<String>,
 }
 
 impl AppState {
@@ -23,11 +24,13 @@ impl AppState {
             .to_owned();
         let width = Value::new(0);
         let height = Value::new(0);
+        let openrouter_key = Value::new(String::new());
 
         Ok(Self {
             path: Value::new(path),
             width,
             height,
+            openrouter_key,
         })
     }
 }
@@ -43,6 +46,11 @@ impl Component for App {
         mut _children: anathema::component::Children<'_, '_>,
         context: anathema::component::Context<'_, '_, Self::State>,
     ) {
+        if let Ok(openrouter_key) = std::env::var("OPENROUTER_API_KEY") {
+            println!("{openrouter_key}");
+            state.openrouter_key.set(openrouter_key);
+        }
+
         self.set_size(context, state);
     }
 
