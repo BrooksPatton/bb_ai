@@ -20,6 +20,8 @@ fn main() -> Result<()> {
 
     builder.default::<()>("connection_side", "templates/connections_side.aml")?;
     builder.default::<()>("model_modal", "templates/model_modal.aml")?;
+    builder.default::<()>("router", "templates/router.aml")?;
+    builder.default::<()>("home", "templates/pages/home.aml")?;
 
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;
 

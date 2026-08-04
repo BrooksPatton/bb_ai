@@ -1,0 +1,8 @@
+vstack
+	hstack
+		spacer
+		border [border_style: "rounded"]
+			text "My first message"
+	text "AI response"
+	spacer
+	@input

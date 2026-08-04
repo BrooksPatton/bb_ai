@@ -5,6 +5,8 @@ use anathema::{
 };
 use eyre::{Context, OptionExt, Result};
 
+use crate::router::Route;
+
 pub struct App;
 
 #[derive(Debug, State)]
@@ -14,6 +16,7 @@ pub struct AppState {
     height: Value<u16>,
     openrouter_key: Value<String>,
     choosing_model: Value<bool>,
+    route: Value<String>,
 }
 
 impl AppState {
@@ -27,6 +30,7 @@ impl AppState {
         let height = Value::new(0);
         let openrouter_key = Value::new(String::new());
         let choosing_model = Value::new(false);
+        let route = Route::Home.as_value();
 
         Ok(Self {
             path: Value::new(path),
@@ -34,6 +38,7 @@ impl AppState {
             height,
             openrouter_key,
             choosing_model,
+            route,
         })
     }
 }

@@ -1,2 +1,7 @@
-border [foreground: "white"]
-	text "Model Modal"
+border [foreground: "white", width: 50]
+	container [background: "black"]
+		border [sides: "bottom"]
+			hstack
+				spacer
+				text "Models"
+				spacer
