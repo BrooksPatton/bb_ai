@@ -1,4 +1,4 @@
 if attributes.route == "Home"
-	@home [width: attributes.width]
+	@home (PromptSubmitted->PromptSubmitted) [width: attributes.width]
 else if attributes.route == "Changing Model"
 	@model_chooser

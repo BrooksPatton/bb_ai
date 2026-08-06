@@ -12,6 +12,10 @@ impl Route {
 
         Value::new(route)
     }
+
+    pub fn name(&self) -> String {
+        (*self).into()
+    }
 }
 
 impl From<Route> for String {

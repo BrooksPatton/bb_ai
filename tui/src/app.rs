@@ -1,4 +1,4 @@
-use crate::router::Route;
+use crate::{pages::home, router::Route};
 use anathema::{
     component::Component,
     geometry::Size,
@@ -78,6 +78,27 @@ impl Component for App {
     ) {
         match message {
             AppMessage::SlashModel => state.route.set(Route::ModelChooser.into()),
+        }
+    }
+
+    fn on_event(
+        &mut self,
+        event: &mut anathema::component::UserEvent<'_>,
+        state: &mut Self::State,
+        mut _children: anathema::component::Children<'_, '_>,
+        mut _context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        if let Some(home_event) = event.data_checked::<home::Event>() {
+            match home_event {
+                home::Event::PromptSubmitted(prompt) => {
+                    if prompt == "/model" {
+                        let new_route = Route::ModelChooser;
+
+                        state.route.set(new_route.name());
+                    }
+                }
+                home::Event::None => (),
+            }
         }
     }
 }

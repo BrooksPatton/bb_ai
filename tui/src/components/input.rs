@@ -3,8 +3,6 @@ use anathema::{
     state::{State, Value},
 };
 
-use crate::app::AppMessage;
-
 const CURSOR: &str = "|";
 
 pub struct Input {
@@ -73,9 +71,12 @@ impl Component for Input {
 
                 let mut value_with_cursor = self.value.clone();
                 value_with_cursor.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
-                let value = value_with_cursor.iter().collect();
+                let value: String = value_with_cursor.iter().collect();
 
-                state.value.set(value);
+                state.value.set(value.clone());
+
+                let event = Event::OnUpdate(value);
+                context.publish(&event.name(), event);
             }
             anathema::component::KeyCode::Tab => todo!(),
             anathema::component::KeyCode::BackTab => todo!(),
@@ -83,16 +84,12 @@ impl Component for Input {
             anathema::component::KeyCode::Backspace => todo!(),
             anathema::component::KeyCode::Enter => {
                 let value = self.value.iter().collect::<String>();
-
-                if value == "/model" {
-                    let message = AppMessage::SlashModel;
-
-                    context.components.by_name("app").send(message);
-                }
+                let event = Event::OnSubmit(value);
 
                 self.value.clear();
                 self.cursor_pos = 0;
                 state.value.set(String::from(CURSOR));
+                context.publish(&event.name(), event);
             }
             anathema::component::KeyCode::Left => todo!(),
             anathema::component::KeyCode::Right => todo!(),
@@ -115,5 +112,27 @@ impl Component for Input {
             anathema::component::KeyCode::Menu => todo!(),
             anathema::component::KeyCode::KeypadBegin => todo!(),
         }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Event {
+    OnSubmit(String),
+    OnUpdate(String),
+}
+
+impl Event {
+    pub fn name(&self) -> String {
+        self.to_owned().into()
+    }
+}
+
+impl From<Event> for String {
+    fn from(value: Event) -> Self {
+        match value {
+            Event::OnSubmit(_) => "OnSubmit",
+            Event::OnUpdate(_) => "OnUpdate",
+        }
+        .to_owned()
     }
 }
