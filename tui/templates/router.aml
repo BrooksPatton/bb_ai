@@ -1,2 +1,2 @@
 if attributes.route == "Home"
-	@home
+	@home [width: attributes.width]

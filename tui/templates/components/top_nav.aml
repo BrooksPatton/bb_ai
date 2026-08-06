@@ -1,0 +1,5 @@
+border [sides: "bottom"]
+	hstack
+		text "BB AI"
+		spacer
+		text attributes.path

@@ -1,8 +1,30 @@
-vstack
-	hstack
+hstack
+	vstack [width: attributes.width - 40]
+		hstack
+			spacer
+			border [border_style: "rounded"]
+				text "My first message"
+		text "AI response"
 		spacer
-		border [border_style: "rounded"]
-			text "My first message"
-	text "AI response"
-	spacer
-	@input
+		@input
+	border [sides: "left", width: 40]
+		vstack
+			border [sides: "bottom"]
+				hstack
+					spacer
+					text "Session"
+					spacer
+			text "Tokens: 0"
+			text "Cost: $0.00"
+			text "model: -----"
+			@connection_side [openrouter_key: state.openrouter_key]
+			padding [top: 1]
+				border [sides: "bottom"]
+					hstack
+						spacer
+						text "Log"
+						spacer
+			text "Query: My first..."
+			padding [top: 1]
+				text "Response: Ai response..."
+			spacer
