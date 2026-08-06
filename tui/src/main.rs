@@ -22,6 +22,7 @@ fn main() -> Result<()> {
     builder.default::<()>("model_modal", "templates/model_modal.aml")?;
     builder.default::<()>("router", "templates/router.aml")?;
     builder.default::<()>("home", "templates/pages/home.aml")?;
+    builder.default::<()>("model_chooser", "templates/pages/model_chooser.aml")?;
     builder.default::<()>("top_nav", "templates/components/top_nav.aml")?;
 
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;

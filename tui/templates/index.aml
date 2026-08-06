@@ -1,4 +1,3 @@
 vstack
-	@top_nav [path: state.path, width: state.width, height: state.height]
-	hstack
-		@router [route: state.route, width: state.width]
+	@top_nav [path: state.path, width: state.width, height: state.height, route: state.route]
+	@router [route: state.route, width: state.width]

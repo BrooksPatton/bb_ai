@@ -1,11 +1,10 @@
+use crate::router::Route;
 use anathema::{
     component::Component,
     geometry::Size,
     state::{State, Value},
 };
 use eyre::{Context, OptionExt, Result};
-
-use crate::router::Route;
 
 pub struct App;
 
@@ -15,7 +14,6 @@ pub struct AppState {
     width: Value<u16>,
     height: Value<u16>,
     openrouter_key: Value<String>,
-    choosing_model: Value<bool>,
     route: Value<String>,
 }
 
@@ -29,7 +27,6 @@ impl AppState {
         let width = Value::new(0);
         let height = Value::new(0);
         let openrouter_key = Value::new(String::new());
-        let choosing_model = Value::new(false);
         let route = Route::Home.as_value();
 
         Ok(Self {
@@ -37,7 +34,6 @@ impl AppState {
             width,
             height,
             openrouter_key,
-            choosing_model,
             route,
         })
     }
@@ -45,7 +41,6 @@ impl AppState {
 
 impl Component for App {
     type State = AppState;
-
     type Message = AppMessage;
 
     fn on_mount(
@@ -78,11 +73,11 @@ impl Component for App {
         &mut self,
         message: Self::Message,
         state: &mut Self::State,
-        mut children: anathema::component::Children<'_, '_>,
-        mut context: anathema::component::Context<'_, '_, Self::State>,
+        mut _children: anathema::component::Children<'_, '_>,
+        mut _context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         match message {
-            AppMessage::SlashModel => state.choosing_model.set(true),
+            AppMessage::SlashModel => state.route.set(Route::ModelChooser.into()),
         }
     }
 }

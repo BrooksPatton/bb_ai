@@ -18,7 +18,7 @@ impl From<Route> for String {
     fn from(value: Route) -> Self {
         match value {
             Route::Home => "Home",
-            Route::ModelChooser => "ModelChooser",
+            Route::ModelChooser => "Changing Model",
         }
         .to_owned()
     }
