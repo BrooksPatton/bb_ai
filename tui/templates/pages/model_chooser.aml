@@ -1,2 +1,16 @@
 vstack
-	text "Choosing Model"
+	if state.loading
+		text "Loading"
+		text "meow"
+	else
+		for name in state.model_names
+			hstack
+				text name
+				text " ("
+				text state.model_ids[loop]
+				text ") "
+				text state.model_context[loop]
+				text " "
+				text state.model_input_price[loop]
+				text " "
+				text state.model_output_price[loop]

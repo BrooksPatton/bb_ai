@@ -27,7 +27,7 @@ impl AppState {
         let width = Value::new(0);
         let height = Value::new(0);
         let openrouter_key = Value::new(String::new());
-        let route = Route::Home.as_value();
+        let route = Route::ModelChooser.as_value();
 
         Ok(Self {
             path: Value::new(path),

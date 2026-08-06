@@ -1,0 +1,9 @@
+[package]
+name = "openrouter_api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+eyre = "0.6.12"
+serde   = { version = "1.0.229", features = ["derive"] }
+reqwest = { version   = "0.13.4", features = ["blocking", "json"] }

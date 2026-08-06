@@ -5,6 +5,7 @@ use eyre::Result;
 use tui::app::{App, AppState};
 use tui::components::input::{Input, InputState};
 use tui::pages::home::HomePage;
+use tui::pages::model_chooser::{ModelChooserPage, ModelChooserPageState};
 
 fn main() -> Result<()> {
     let doc = Document::new("@app");
@@ -22,11 +23,16 @@ fn main() -> Result<()> {
     builder.default::<()>("connection_side", "templates/connections_side.aml")?;
     builder.default::<()>("model_modal", "templates/model_modal.aml")?;
     builder.default::<()>("router", "templates/router.aml")?;
-    builder.default::<()>("model_chooser", "templates/pages/model_chooser.aml")?;
     builder.default::<()>("top_nav", "templates/components/top_nav.aml")?;
 
     builder.component("app", "templates/index.aml", App, AppState::new()?)?;
     builder.component("home", "templates/pages/home.aml", HomePage, ())?;
+    builder.component(
+        "model_chooser",
+        "templates/pages/model_chooser.aml",
+        ModelChooserPage,
+        ModelChooserPageState::new(),
+    )?;
 
     builder.prototype("input", "templates/input.aml", Input::new, InputState::new)?;
 
