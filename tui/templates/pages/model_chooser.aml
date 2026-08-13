@@ -1,28 +1,36 @@
 vstack
-	if state.loading
-		text "Loading"
-		text "meow"
-	else
-		hstack
-			spacer
-			vstack
-				border [sides: "bottom", border_style: "thick"]
-					hstack
-						padding [right: 45]
-							text "Model Name"
-						padding [left: 2]
-							text "Context"
-						padding [left: 2]
-							text "Input Price"
-						padding [left: 2]
-							text "Response Price"
-				for name in state.model_names
-					hstack
-						container [min_width: 45]
-							text name
-						container [min_width: 12]
-							text state.model_context[loop]
-						container [min_width: 15]
-							text state.model_input_price[loop]
-						text state.model_output_price[loop]
-			spacer
+	hstack
+		spacer
+		border [sides: "bottom", border_style: "thick"]
+			hstack
+				padding [right: 45]
+					text "Model Name"
+				padding [left: 2]
+					text "Context"
+				padding [left: 2]
+					text "Input Price"
+				padding [left: 2]
+					text "Response Price"
+		spacer
+	overflow
+		vstack
+			for name in state.model_names
+				padding [left: 19]
+					if loop == state.selected_index
+						hstack [background: "red"]
+							container [min_width: 57]
+								text name
+							container [min_width: 9]
+								text state.model_context[loop]
+							container [min_width: 13]
+								text state.model_input_price[loop]
+							text state.model_output_price[loop]
+					else
+						hstack 
+							container [min_width: 57]
+								text name
+							container [min_width: 9]
+								text state.model_context[loop]
+							container [min_width: 13]
+								text state.model_input_price[loop]
+							text state.model_output_price[loop]
