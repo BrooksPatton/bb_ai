@@ -16,10 +16,14 @@ impl Component for ModelChooserPage {
         mut _children: anathema::component::Children<'_, '_>,
         context: anathema::component::Context<'_, '_, Self::State>,
     ) {
+        let height = context.viewport.size().height - 2;
+
         state.loading.set(true);
 
         if let Some(openrouter_api_key) = context.attributes.get_as::<&str>("openrouter_key") {
-            let models = openrouter_api::get_list_of_models(openrouter_api_key, 10, 0).unwrap();
+            let models =
+                openrouter_api::get_list_of_models(openrouter_api_key, usize::from(height), 0)
+                    .unwrap();
             let model_names = models.iter().map(|model| model.name.clone());
             let model_ids = models.iter().map(|model| model.id.clone());
             let model_context = models.iter().map(|model| model.context_length);

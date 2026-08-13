@@ -3,12 +3,26 @@ vstack
 		text "Loading"
 		text "meow"
 	else
-		for name in state.model_names
-			hstack
-				text name
-				spacer
-				text state.model_context[loop]
-				spacer
-				text state.model_input_price[loop]
-				spacer
-				text state.model_output_price[loop]
+		hstack
+			spacer
+			vstack
+				border [sides: "bottom", border_style: "thick"]
+					hstack
+						padding [right: 45]
+							text "Model Name"
+						padding [left: 2]
+							text "Context"
+						padding [left: 2]
+							text "Input Price"
+						padding [left: 2]
+							text "Response Price"
+				for name in state.model_names
+					hstack
+						container [min_width: 45]
+							text name
+						container [min_width: 12]
+							text state.model_context[loop]
+						container [min_width: 15]
+							text state.model_input_price[loop]
+						text state.model_output_price[loop]
+			spacer
