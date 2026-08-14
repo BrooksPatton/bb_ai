@@ -69,10 +69,19 @@ impl Component for Input {
                 self.value.insert(self.cursor_pos, character);
                 self.cursor_pos += 1;
 
-                let mut value_with_cursor = self.value.clone();
-                value_with_cursor.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
-                let value: String = value_with_cursor.iter().collect();
+                let mut value = self.value.clone();
 
+                if let Some(use_cursor) = context
+                    .attribute("cursor")
+                    .map(|attr| attr.as_bool())
+                    .flatten()
+                {
+                    if use_cursor {
+                        value.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
+                    }
+                }
+
+                let value: String = value.iter().collect();
                 state.value.set(value.clone());
 
                 let event = Event::OnUpdate(value);
@@ -81,7 +90,32 @@ impl Component for Input {
             anathema::component::KeyCode::Tab => todo!(),
             anathema::component::KeyCode::BackTab => todo!(),
             anathema::component::KeyCode::CtrlC => todo!(),
-            anathema::component::KeyCode::Backspace => todo!(),
+            anathema::component::KeyCode::Backspace => {
+                if self.value.is_empty() {
+                    return;
+                }
+
+                self.value.pop();
+                self.cursor_pos -= 1;
+
+                let mut value = self.value.clone();
+
+                if let Some(use_cursor) = context
+                    .attribute("cursor")
+                    .map(|attr| attr.as_bool())
+                    .flatten()
+                {
+                    if use_cursor {
+                        value.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
+                    }
+                }
+
+                let value: String = value.iter().collect();
+                state.value.set(value.clone());
+
+                let event = Event::OnUpdate(value);
+                context.publish(&event.name(), event);
+            }
             anathema::component::KeyCode::Enter => {
                 let value = self.value.iter().collect::<String>();
                 let event = Event::OnSubmit(value);

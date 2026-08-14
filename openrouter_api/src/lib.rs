@@ -35,7 +35,7 @@ pub fn get_list_of_models(
     Ok(models)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OpenRouterModel {
     pub context_length: usize,
     pub id: String,

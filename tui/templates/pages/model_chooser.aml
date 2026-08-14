@@ -1,4 +1,5 @@
 vstack
+	@input (OnUpdate -> OnUpdate)
 	hstack
 		spacer
 		border [sides: "bottom", border_style: "thick"]

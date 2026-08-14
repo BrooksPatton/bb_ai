@@ -30,7 +30,7 @@ fn main() -> Result<()> {
     builder.component(
         "model_chooser",
         "templates/pages/model_chooser.aml",
-        ModelChooserPage,
+        ModelChooserPage::default(),
         ModelChooserPageState::new(),
     )?;
 
