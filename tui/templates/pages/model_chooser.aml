@@ -14,24 +14,26 @@ vstack
 					text "Response Price"
 		spacer
 	overflow
-		vstack
-			for name in state.model_names
-				padding [left: 19]
-					if loop == state.selected_index
-						hstack [background: "red"]
-							container [min_width: 57]
-								text name
-							container [min_width: 9]
-								text state.model_context[loop]
-							container [min_width: 13]
-								text state.model_input_price[loop]
-							text state.model_output_price[loop]
-					else
-						hstack 
-							container [min_width: 57]
-								text name
-							container [min_width: 9]
-								text state.model_context[loop]
-							container [min_width: 13]
-								text state.model_input_price[loop]
-							text state.model_output_price[loop]
+		for name in state.model_names
+			if loop == state.selected_index
+				hstack [background: "red"]
+					spacer
+					container [min_width: 57]
+						text name
+					container [min_width: 9]
+						text state.model_context[loop]
+					container [min_width: 13]
+						text state.model_input_price[loop]
+					text state.model_output_price[loop]
+					spacer
+			else
+				hstack 
+					spacer
+					container [min_width: 57]
+						text name
+					container [min_width: 9]
+						text state.model_context[loop]
+					container [min_width: 13]
+						text state.model_input_price[loop]
+					text state.model_output_price[loop]
+					spacer
