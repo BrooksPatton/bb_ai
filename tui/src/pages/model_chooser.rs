@@ -1,11 +1,13 @@
-use crate::components::input;
+use crate::{
+    app::{self, AppMessage},
+    components::input,
+};
 use anathema::{
     component::Component,
     default_widgets::Overflow,
     state::{List, State, Value},
 };
 use openrouter_api::OpenRouterModel;
-use std::ops::Sub;
 
 #[derive(Debug, Default)]
 pub struct ModelChooserPage(Vec<OpenRouterModel>);
@@ -70,7 +72,22 @@ impl Component for ModelChooserPage {
             anathema::component::KeyCode::BackTab => todo!(),
             anathema::component::KeyCode::CtrlC => todo!(),
             anathema::component::KeyCode::Backspace => todo!(),
-            anathema::component::KeyCode::Enter => todo!(),
+            anathema::component::KeyCode::Enter => {
+                let selected_index = *state.selected_index.to_ref();
+                let Some(model_name) = state
+                    .model_ids
+                    .to_ref()
+                    .get(selected_index)
+                    .map(|value| value.to_ref().clone())
+                else {
+                    return;
+                };
+                let app_message = AppMessage::ChoseModel(model_name);
+
+                state.selected_index.set(0);
+                state.filter.set(String::new());
+                context.components.by_name(app::NAME).send(app_message);
+            }
             anathema::component::KeyCode::Left => todo!(),
             anathema::component::KeyCode::Right => todo!(),
             anathema::component::KeyCode::Up => {
@@ -128,8 +145,8 @@ impl Component for ModelChooserPage {
         &mut self,
         event: &mut anathema::component::UserEvent<'_>,
         state: &mut Self::State,
-        mut children: anathema::component::Children<'_, '_>,
-        mut context: anathema::component::Context<'_, '_, Self::State>,
+        mut _children: anathema::component::Children<'_, '_>,
+        mut _context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         if let Some(data) = event.data_checked::<input::Event>() {
             match data {

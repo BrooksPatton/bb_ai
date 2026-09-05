@@ -7,4 +7,5 @@ vstack
 			width: state.width,
 			openrouter_key: state.openrouter_key,
 			height: state.height,
+			model_name: state.model_name,
 		]

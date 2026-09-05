@@ -6,6 +6,8 @@ use anathema::{
 };
 use eyre::{Context, OptionExt, Result};
 
+pub const NAME: &str = "app";
+
 pub struct App;
 
 #[derive(Debug, State)]
@@ -15,6 +17,7 @@ pub struct AppState {
     height: Value<u16>,
     openrouter_key: Value<String>,
     route: Value<String>,
+    model_name: Value<String>,
 }
 
 impl AppState {
@@ -27,7 +30,8 @@ impl AppState {
         let width = Value::new(0);
         let height = Value::new(0);
         let openrouter_key = Value::new(String::new());
-        let route = Route::ModelChooser.as_value();
+        let route = Route::Home.as_value();
+        let model_name = Value::new(String::new());
 
         Ok(Self {
             path: Value::new(path),
@@ -35,6 +39,7 @@ impl AppState {
             height,
             openrouter_key,
             route,
+            model_name,
         })
     }
 }
@@ -78,6 +83,10 @@ impl Component for App {
     ) {
         match message {
             AppMessage::SlashModel => state.route.set(Route::ModelChooser.into()),
+            AppMessage::ChoseModel(name) => {
+                state.model_name.set(name);
+                state.route.set(Route::Home.name());
+            }
         }
     }
 
@@ -118,4 +127,5 @@ impl App {
 
 pub enum AppMessage {
     SlashModel,
+    ChoseModel(String),
 }

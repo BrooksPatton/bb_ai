@@ -1,5 +1,10 @@
 if attributes.route == "Home"
-	@home (PromptSubmitted->PromptSubmitted) [width: attributes.width]
+	@home (
+		PromptSubmitted->PromptSubmitted
+	) [
+		width: attributes.width,
+		model_name: attributes.model_name,
+	]
 else if attributes.route == "Changing Model"
 	@model_chooser [
 		openrouter_key: attributes.openrouter_key,

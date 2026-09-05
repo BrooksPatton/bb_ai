@@ -2,7 +2,7 @@
 use anathema::prelude::{Backend, Document, TuiBackend};
 use anathema::runtime::Runtime;
 use eyre::Result;
-use tui::app::{App, AppState};
+use tui::app::{self, App, AppState};
 use tui::components::input::{Input, InputState};
 use tui::pages::home::HomePage;
 use tui::pages::model_chooser::{ModelChooserPage, ModelChooserPageState};
@@ -25,7 +25,7 @@ fn main() -> Result<()> {
     builder.default::<()>("router", "templates/router.aml")?;
     builder.default::<()>("top_nav", "templates/components/top_nav.aml")?;
 
-    builder.component("app", "templates/index.aml", App, AppState::new()?)?;
+    builder.component(app::NAME, "templates/index.aml", App, AppState::new()?)?;
     builder.component("home", "templates/pages/home.aml", HomePage, ())?;
     builder.component(
         "model_chooser",
