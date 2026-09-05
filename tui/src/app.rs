@@ -1,9 +1,12 @@
+use crate::{pages::home, router::Route};
 use anathema::{
     component::Component,
     geometry::Size,
     state::{State, Value},
 };
 use eyre::{Context, OptionExt, Result};
+
+pub const NAME: &str = "app";
 
 pub struct App;
 
@@ -13,6 +16,8 @@ pub struct AppState {
     width: Value<u16>,
     height: Value<u16>,
     openrouter_key: Value<String>,
+    route: Value<String>,
+    model_name: Value<String>,
 }
 
 impl AppState {
@@ -25,20 +30,23 @@ impl AppState {
         let width = Value::new(0);
         let height = Value::new(0);
         let openrouter_key = Value::new(String::new());
+        let route = Route::Home.as_value();
+        let model_name = Value::new(String::new());
 
         Ok(Self {
             path: Value::new(path),
             width,
             height,
             openrouter_key,
+            route,
+            model_name,
         })
     }
 }
 
 impl Component for App {
     type State = AppState;
-
-    type Message = ();
+    type Message = AppMessage;
 
     fn on_mount(
         &mut self,
@@ -47,7 +55,6 @@ impl Component for App {
         context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         if let Ok(openrouter_key) = std::env::var("OPENROUTER_API_KEY") {
-            println!("{openrouter_key}");
             state.openrouter_key.set(openrouter_key);
         }
 
@@ -66,6 +73,43 @@ impl Component for App {
     fn accept_focus(&self) -> bool {
         false
     }
+
+    fn on_message(
+        &mut self,
+        message: Self::Message,
+        state: &mut Self::State,
+        mut _children: anathema::component::Children<'_, '_>,
+        mut _context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        match message {
+            AppMessage::SlashModel => state.route.set(Route::ModelChooser.into()),
+            AppMessage::ChoseModel(name) => {
+                state.model_name.set(name);
+                state.route.set(Route::Home.name());
+            }
+        }
+    }
+
+    fn on_event(
+        &mut self,
+        event: &mut anathema::component::UserEvent<'_>,
+        state: &mut Self::State,
+        mut _children: anathema::component::Children<'_, '_>,
+        mut _context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        if let Some(home_event) = event.data_checked::<home::Event>() {
+            match home_event {
+                home::Event::PromptSubmitted(prompt) => {
+                    if prompt == "/model" {
+                        let new_route = Route::ModelChooser;
+
+                        state.route.set(new_route.name());
+                    }
+                }
+                home::Event::None => (),
+            }
+        }
+    }
 }
 
 impl App {
@@ -79,4 +123,9 @@ impl App {
         state.width.set(width);
         state.height.set(height);
     }
+}
+
+pub enum AppMessage {
+    SlashModel,
+    ChoseModel(String),
 }

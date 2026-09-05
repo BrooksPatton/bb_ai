@@ -1,0 +1,39 @@
+vstack
+	@input (OnUpdate -> OnUpdate)
+	hstack
+		spacer
+		border [sides: "bottom", border_style: "thick"]
+			hstack
+				padding [right: 45]
+					text "Model Name"
+				padding [left: 2]
+					text "Context"
+				padding [left: 2]
+					text "Input Price"
+				padding [left: 2]
+					text "Response Price"
+		spacer
+	overflow
+		for name in state.model_names
+			if loop == state.selected_index
+				hstack [background: "red"]
+					spacer
+					container [min_width: 57]
+						text name
+					container [min_width: 9]
+						text state.model_context[loop]
+					container [min_width: 13]
+						text state.model_input_price[loop]
+					text state.model_output_price[loop]
+					spacer
+			else
+				hstack 
+					spacer
+					container [min_width: 57]
+						text name
+					container [min_width: 9]
+						text state.model_context[loop]
+					container [min_width: 13]
+						text state.model_input_price[loop]
+					text state.model_output_price[loop]
+					spacer

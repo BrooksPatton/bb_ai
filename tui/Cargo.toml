@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 anathema = "0.2.11"
 eyre = "0.6.12"
+openrouter_api = { path = "../openrouter_api/" }

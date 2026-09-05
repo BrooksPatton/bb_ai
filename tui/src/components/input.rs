@@ -62,28 +62,68 @@ impl Component for Input {
         key: anathema::component::KeyEvent,
         state: &mut Self::State,
         mut _children: anathema::component::Children<'_, '_>,
-        mut _context: anathema::component::Context<'_, '_, Self::State>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         match key.code {
             anathema::component::KeyCode::Char(character) => {
                 self.value.insert(self.cursor_pos, character);
                 self.cursor_pos += 1;
 
-                let mut value_with_cursor = self.value.clone();
-                value_with_cursor.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
-                let value = value_with_cursor.iter().collect();
+                let mut value = self.value.clone();
 
-                state.value.set(value);
+                if let Some(use_cursor) = context
+                    .attribute("cursor")
+                    .map(|attr| attr.as_bool())
+                    .flatten()
+                {
+                    if use_cursor {
+                        value.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
+                    }
+                }
+
+                let value: String = value.iter().collect();
+                state.value.set(value.clone());
+
+                let event = Event::OnUpdate(value);
+                context.publish(&event.name(), event);
             }
             anathema::component::KeyCode::Tab => todo!(),
             anathema::component::KeyCode::BackTab => todo!(),
             anathema::component::KeyCode::CtrlC => todo!(),
-            anathema::component::KeyCode::Backspace => todo!(),
+            anathema::component::KeyCode::Backspace => {
+                if self.value.is_empty() {
+                    return;
+                }
+
+                self.value.pop();
+                self.cursor_pos -= 1;
+
+                let mut value = self.value.clone();
+
+                if let Some(use_cursor) = context
+                    .attribute("cursor")
+                    .map(|attr| attr.as_bool())
+                    .flatten()
+                {
+                    if use_cursor {
+                        value.insert(self.cursor_pos, CURSOR.chars().nth(0).unwrap());
+                    }
+                }
+
+                let value: String = value.iter().collect();
+                state.value.set(value.clone());
+
+                let event = Event::OnUpdate(value);
+                context.publish(&event.name(), event);
+            }
             anathema::component::KeyCode::Enter => {
+                let value = self.value.iter().collect::<String>();
+                let event = Event::OnSubmit(value);
+
                 self.value.clear();
                 self.cursor_pos = 0;
-
                 state.value.set(String::from(CURSOR));
+                context.publish(&event.name(), event);
             }
             anathema::component::KeyCode::Left => todo!(),
             anathema::component::KeyCode::Right => todo!(),
@@ -106,5 +146,27 @@ impl Component for Input {
             anathema::component::KeyCode::Menu => todo!(),
             anathema::component::KeyCode::KeypadBegin => todo!(),
         }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Event {
+    OnSubmit(String),
+    OnUpdate(String),
+}
+
+impl Event {
+    pub fn name(&self) -> String {
+        self.to_owned().into()
+    }
+}
+
+impl From<Event> for String {
+    fn from(value: Event) -> Self {
+        match value {
+            Event::OnSubmit(_) => "OnSubmit",
+            Event::OnUpdate(_) => "OnUpdate",
+        }
+        .to_owned()
     }
 }
