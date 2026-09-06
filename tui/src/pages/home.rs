@@ -1,17 +1,23 @@
 use crate::components::input;
-use anathema::component::Component;
+use anathema::{
+    component::Component,
+    state::{List, State, Value},
+};
+
+const MESSAGE_FROM_USER: &str = "user";
+const MESSAGE_FROM_AI: &str = "assistant";
 
 pub struct HomePage;
 
 impl Component for HomePage {
-    type State = ();
+    type State = HomeState;
 
     type Message = ();
 
     fn on_event(
         &mut self,
         event: &mut anathema::component::UserEvent<'_>,
-        _state: &mut Self::State,
+        state: &mut Self::State,
         mut _children: anathema::component::Children<'_, '_>,
         mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
@@ -20,9 +26,8 @@ impl Component for HomePage {
         if let Some(event) = event.data_checked::<input::Event>() {
             match event {
                 input::Event::OnSubmit(value) => {
-                    let event = Event::PromptSubmitted(value.to_owned());
-
-                    context.publish(&event.name(), event);
+                    state.messages.push(value.to_owned());
+                    state.messages_from.push(MESSAGE_FROM_USER.to_owned());
                 }
                 input::Event::OnUpdate(_) => (),
             }
@@ -53,5 +58,17 @@ impl From<Event> for String {
             Event::None => "None ",
         }
         .to_owned()
+    }
+}
+
+#[derive(Debug, State, Default)]
+pub struct HomeState {
+    messages: Value<List<String>>,
+    messages_from: Value<List<String>>,
+}
+
+impl HomeState {
+    pub fn new() -> Self {
+        Self::default()
     }
 }

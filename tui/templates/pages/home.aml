@@ -1,10 +1,14 @@
 hstack
 	vstack [width: attributes.width - 40]
-		hstack
-			spacer
-			border [border_style: "rounded"]
-				text "My first message"
-		text "AI response"
+		container [height: attributes.height - 7]
+			for message in state.messages
+				hstack
+					if state.messages_from[loop] == "user"
+						spacer
+						border [border_style: "rounded"]
+							text message
+					else
+						text message
 		spacer
 		@input (
 			OnSubmit -> OnSubmit,
