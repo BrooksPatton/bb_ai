@@ -23,3 +23,11 @@ pub fn run() -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn unit_canary_test() {
+assert_eq!(5, 5);
+    }
+}

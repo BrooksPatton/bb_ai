@@ -9,6 +9,9 @@
 ## Basic Setup
 
 - [x] Docker container set up for dev
+- [x] Canary tests set up
+  - [x] integration
+  - [x] unit
 - [ ] Github Actions set up for
   - [ ] testing
   - [ ] linting
