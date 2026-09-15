@@ -8,7 +8,7 @@
 
 ## Basic Setup
 
-- [ ] Docker container set up for dev
+- [x] Docker container set up for dev
 - [ ] Github Actions set up for
   - [ ] testing
   - [ ] linting

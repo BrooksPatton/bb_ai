@@ -1,0 +1,8 @@
+[package]
+name = "anathema_tui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anathema = "0.2.11"
+eyre = {workspace = true}
