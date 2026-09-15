@@ -6,7 +6,18 @@
 - [ ] LinkedIn account supporter
 - [ ] Programming error lookup
 
-## Skills / Abilities
+## Basic Setup
 
-- [ ] /loop, for routinely running a task over and over again over a period of time
-
+- [ ] Docker container set up for dev
+- [ ] Github Actions set up for
+  - [ ] testing
+  - [ ] linting
+- [ ] Logging
+- [ ] component library
+  - [ ] Reset component library
+- [ ] Design
+  - [ ] Splash page
+  - [ ] Error page
+  - [ ] Messaging
+  - [ ] Router
+  - [ ] Central data store
