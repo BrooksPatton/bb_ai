@@ -1,0 +1,9 @@
+let THEME = {
+	user: {border_style: "rounded"},
+	assistant: {border_style: "        "},
+}
+
+hstack
+	text attributes.role
+	text ": "
+	text attributes.message

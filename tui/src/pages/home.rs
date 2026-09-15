@@ -1,4 +1,7 @@
-use crate::components::input;
+use crate::{
+    app::{self, AppMessage},
+    components::input,
+};
 use anathema::{
     component::Component,
     state::{List, State, Value},
@@ -6,13 +9,14 @@ use anathema::{
 
 const MESSAGE_FROM_USER: &str = "user";
 const MESSAGE_FROM_AI: &str = "assistant";
+pub const NAME: &str = "home";
 
 pub struct HomePage;
 
 impl Component for HomePage {
     type State = HomeState;
 
-    type Message = ();
+    type Message = HomeMessage;
 
     fn on_event(
         &mut self,
@@ -28,6 +32,10 @@ impl Component for HomePage {
                 input::Event::OnSubmit(value) => {
                     state.messages.push(value.to_owned());
                     state.messages_from.push(MESSAGE_FROM_USER.to_owned());
+                    context
+                        .components
+                        .by_name(app::NAME)
+                        .send(AppMessage::SendQuery(value.to_owned()));
                 }
                 input::Event::OnUpdate(_) => (),
             }
@@ -36,6 +44,21 @@ impl Component for HomePage {
 
     fn accept_focus(&self) -> bool {
         false
+    }
+
+    fn on_message(
+        &mut self,
+        message: Self::Message,
+        state: &mut Self::State,
+        mut children: anathema::component::Children<'_, '_>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        match message {
+            HomeMessage::AgentResponse(response) => {
+                state.messages.push(response);
+                state.messages_from.push(MESSAGE_FROM_AI.to_owned());
+            }
+        }
     }
 }
 
@@ -71,4 +94,8 @@ impl HomeState {
     pub fn new() -> Self {
         Self::default()
     }
+}
+
+pub enum HomeMessage {
+    AgentResponse(String),
 }

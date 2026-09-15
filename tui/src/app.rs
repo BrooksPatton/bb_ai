@@ -1,4 +1,10 @@
-use crate::{pages::home, router::Route};
+use std::sync::mpsc::{Receiver, Sender};
+
+use crate::{
+    pages::home::{self, HomeMessage},
+    router::Route,
+};
+use agent::BBAgentRequest;
 use anathema::{
     component::Component,
     geometry::Size,
@@ -7,8 +13,9 @@ use anathema::{
 use eyre::{Context, OptionExt, Result};
 
 pub const NAME: &str = "app";
+const OPENROUTER_API_URL: &str = "https://openrouter.ai/api/v1";
 
-pub struct App;
+pub struct App(pub Sender<BBAgentRequest>, pub Receiver<Result<String>>);
 
 #[derive(Debug, State)]
 pub struct AppState {
@@ -87,6 +94,16 @@ impl Component for App {
                 state.model_name.set(name);
                 state.route.set(Route::Home.name());
             }
+            AppMessage::SendQuery(query) => {
+                let request = BBAgentRequest {
+                    model: state.model_name.to_ref().clone(),
+                    api_key: state.openrouter_key.to_ref().clone(),
+                    api_url: OPENROUTER_API_URL.to_owned(),
+                    prompt: query,
+                };
+
+                self.0.send(request).unwrap()
+            }
         }
     }
 
@@ -110,6 +127,26 @@ impl Component for App {
             }
         }
     }
+
+    fn on_tick(
+        &mut self,
+        _state: &mut Self::State,
+        mut children: anathema::component::Children<'_, '_>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
+        dt: std::time::Duration,
+    ) {
+        if let Ok(response) = self.1.try_recv() {
+            if let Err(error) = &response {
+                eprintln!("{error}");
+                return;
+            };
+
+            context
+                .components
+                .by_name(home::NAME)
+                .send(HomeMessage::AgentResponse(response.unwrap()));
+        }
+    }
 }
 
 impl App {
@@ -128,4 +165,5 @@ impl App {
 pub enum AppMessage {
     SlashModel,
     ChoseModel(String),
+    SendQuery(String),
 }

@@ -87,9 +87,9 @@ impl Component for Input {
                 let event = Event::OnUpdate(value);
                 context.publish(&event.name(), event);
             }
-            anathema::component::KeyCode::Tab => todo!(),
-            anathema::component::KeyCode::BackTab => todo!(),
-            anathema::component::KeyCode::CtrlC => todo!(),
+            anathema::component::KeyCode::Tab => (),
+            anathema::component::KeyCode::BackTab => (),
+            anathema::component::KeyCode::CtrlC => (),
             anathema::component::KeyCode::Backspace => {
                 if self.value.is_empty() {
                     return;
@@ -125,26 +125,26 @@ impl Component for Input {
                 state.value.set(String::from(CURSOR));
                 context.publish(&event.name(), event);
             }
-            anathema::component::KeyCode::Left => todo!(),
-            anathema::component::KeyCode::Right => todo!(),
-            anathema::component::KeyCode::Up => todo!(),
-            anathema::component::KeyCode::Down => todo!(),
-            anathema::component::KeyCode::Home => todo!(),
-            anathema::component::KeyCode::End => todo!(),
-            anathema::component::KeyCode::PageUp => todo!(),
-            anathema::component::KeyCode::PageDown => todo!(),
-            anathema::component::KeyCode::Delete => todo!(),
-            anathema::component::KeyCode::Insert => todo!(),
-            anathema::component::KeyCode::F(_) => todo!(),
-            anathema::component::KeyCode::Null => todo!(),
-            anathema::component::KeyCode::Esc => todo!(),
-            anathema::component::KeyCode::CapsLock => todo!(),
-            anathema::component::KeyCode::ScrollLock => todo!(),
-            anathema::component::KeyCode::NumLock => todo!(),
-            anathema::component::KeyCode::PrintScreen => todo!(),
-            anathema::component::KeyCode::Pause => todo!(),
-            anathema::component::KeyCode::Menu => todo!(),
-            anathema::component::KeyCode::KeypadBegin => todo!(),
+            anathema::component::KeyCode::Left => (),
+            anathema::component::KeyCode::Right => (),
+            anathema::component::KeyCode::Up => (),
+            anathema::component::KeyCode::Down => (),
+            anathema::component::KeyCode::Home => (),
+            anathema::component::KeyCode::End => (),
+            anathema::component::KeyCode::PageUp => (),
+            anathema::component::KeyCode::PageDown => (),
+            anathema::component::KeyCode::Delete => (),
+            anathema::component::KeyCode::Insert => (),
+            anathema::component::KeyCode::F(_) => (),
+            anathema::component::KeyCode::Null => (),
+            anathema::component::KeyCode::Esc => (),
+            anathema::component::KeyCode::CapsLock => (),
+            anathema::component::KeyCode::ScrollLock => (),
+            anathema::component::KeyCode::NumLock => (),
+            anathema::component::KeyCode::PrintScreen => (),
+            anathema::component::KeyCode::Pause => (),
+            anathema::component::KeyCode::Menu => (),
+            anathema::component::KeyCode::KeypadBegin => (),
         }
     }
 }

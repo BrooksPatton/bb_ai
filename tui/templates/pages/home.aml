@@ -1,14 +1,12 @@
 hstack
 	vstack [width: attributes.width - 40]
 		container [height: attributes.height - 7]
-			for message in state.messages
-				hstack
-					if state.messages_from[loop] == "user"
-						spacer
-						border [border_style: "rounded"]
-							text message
-					else
-						text message
+			vstack
+				for message in state.messages
+					@ai_message [
+						message: message,
+						role: state.messages_from[loop]
+					]
 		spacer
 		@input (
 			OnSubmit -> OnSubmit,

@@ -67,11 +67,11 @@ impl Component for ModelChooserPage {
         mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         match key.code {
-            anathema::component::KeyCode::Char(_) => todo!(),
-            anathema::component::KeyCode::Tab => todo!(),
-            anathema::component::KeyCode::BackTab => todo!(),
-            anathema::component::KeyCode::CtrlC => todo!(),
-            anathema::component::KeyCode::Backspace => todo!(),
+            anathema::component::KeyCode::Char(_) => (),
+            anathema::component::KeyCode::Tab => (),
+            anathema::component::KeyCode::BackTab => (),
+            anathema::component::KeyCode::CtrlC => (),
+            anathema::component::KeyCode::Backspace => (),
             anathema::component::KeyCode::Enter => {
                 let selected_index = *state.selected_index.to_ref();
                 let Some(model_name) = state
@@ -88,8 +88,8 @@ impl Component for ModelChooserPage {
                 state.filter.set(String::new());
                 context.components.by_name(app::NAME).send(app_message);
             }
-            anathema::component::KeyCode::Left => todo!(),
-            anathema::component::KeyCode::Right => todo!(),
+            anathema::component::KeyCode::Left => (),
+            anathema::component::KeyCode::Right => (),
             anathema::component::KeyCode::Up => {
                 children.elements().by_tag("overflow").first(|el, _| {
                     let overflow = el.to::<Overflow>();
@@ -122,22 +122,22 @@ impl Component for ModelChooserPage {
                     state.selected_index.set(index + 1);
                 });
             }
-            anathema::component::KeyCode::Home => todo!(),
-            anathema::component::KeyCode::End => todo!(),
-            anathema::component::KeyCode::PageUp => todo!(),
-            anathema::component::KeyCode::PageDown => todo!(),
-            anathema::component::KeyCode::Delete => todo!(),
-            anathema::component::KeyCode::Insert => todo!(),
-            anathema::component::KeyCode::F(_) => todo!(),
-            anathema::component::KeyCode::Null => todo!(),
-            anathema::component::KeyCode::Esc => todo!(),
-            anathema::component::KeyCode::CapsLock => todo!(),
-            anathema::component::KeyCode::ScrollLock => todo!(),
-            anathema::component::KeyCode::NumLock => todo!(),
-            anathema::component::KeyCode::PrintScreen => todo!(),
-            anathema::component::KeyCode::Pause => todo!(),
-            anathema::component::KeyCode::Menu => todo!(),
-            anathema::component::KeyCode::KeypadBegin => todo!(),
+            anathema::component::KeyCode::Home => (),
+            anathema::component::KeyCode::End => (),
+            anathema::component::KeyCode::PageUp => (),
+            anathema::component::KeyCode::PageDown => (),
+            anathema::component::KeyCode::Delete => (),
+            anathema::component::KeyCode::Insert => (),
+            anathema::component::KeyCode::F(_) => (),
+            anathema::component::KeyCode::Null => (),
+            anathema::component::KeyCode::Esc => (),
+            anathema::component::KeyCode::CapsLock => (),
+            anathema::component::KeyCode::ScrollLock => (),
+            anathema::component::KeyCode::NumLock => (),
+            anathema::component::KeyCode::PrintScreen => (),
+            anathema::component::KeyCode::Pause => (),
+            anathema::component::KeyCode::Menu => (),
+            anathema::component::KeyCode::KeypadBegin => (),
         }
     }
 

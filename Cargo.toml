@@ -1,5 +1,5 @@
 [workspace]
-members = ["openrouter_api","tui"]
+members = ["agent","openrouter_api","tui"]
 resolver   = "3"
 
 
