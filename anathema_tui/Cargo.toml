@@ -6,3 +6,7 @@ edition = "2024"
 [dependencies]
 anathema = "0.2.11"
 eyre = {workspace = true}
+
+[lints]
+workspace = true
+

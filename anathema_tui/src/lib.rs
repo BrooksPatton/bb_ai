@@ -12,7 +12,8 @@ pub fn run() -> Result<()> {
         .enable_alt_screen()
         .enable_raw_mode()
         .hide_cursor()
-        .finish()?;
+        .finish()
+        .unwrap();
 
     backend.finalize();
 
@@ -28,6 +29,6 @@ pub fn run() -> Result<()> {
 mod tests {
     #[test]
     fn unit_canary_test() {
-assert_eq!(5, 5);
+        assert_eq!(5, 5);
     }
 }
