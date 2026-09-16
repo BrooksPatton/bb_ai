@@ -1,0 +1,13 @@
+name: Anathema TUI
+run-name: ${{ github.actor }} running CI/CD
+on: 
+  - push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+      - name: test
+        run: cargo test
+      
