@@ -12,14 +12,13 @@ pub fn run() -> Result<()> {
         .enable_alt_screen()
         .enable_raw_mode()
         .hide_cursor()
-        .finish()
-        .unwrap();
+        .finish()?;
 
     backend.finalize();
 
     let mut builder = Runtime::builder(doc, &backend);
 
-    builder.default::<()>("app", "templates/index.aml").unwrap();
+    builder.default::<()>("app", "templates/index.aml")?;
     builder.finish(&mut backend, |runtime, backend| runtime.run(backend))?;
 
     Ok(())
