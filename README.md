@@ -12,9 +12,9 @@
 - [x] Canary tests set up
   - [x] integration
   - [x] unit
-- [ ] Github Actions set up for
-  - [ ] testing
-  - [ ] linting
+- [x] Github Actions set up for
+  - [x] testing
+  - [x] linting
 - [ ] Logging
 - [ ] component library
   - [ ] Reset component library
