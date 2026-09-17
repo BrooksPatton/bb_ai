@@ -1,0 +1,15 @@
+let THEME = {
+	error: {
+		color: "red"
+	}
+}
+
+if state.keep_for > 0
+	container [max_height: 3]
+		position [placement: "absolute", top: 0, left: 0]
+			hstack
+				spacer
+				border 
+					padding [padding: 1]
+						text [foreground: THEME[state.theme].color] state.message
+				spacer

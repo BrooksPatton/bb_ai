@@ -149,6 +149,7 @@ name = "anathema_components"
 version = "0.1.0"
 dependencies = [
  "anathema",
+ "eyre",
 ]
 
 [[package]]

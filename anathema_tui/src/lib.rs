@@ -6,6 +6,7 @@ use anathema::{
     runtime::Runtime,
     templates::Document,
 };
+use anathema_components::bb_message::{self, BBMessage, BBMessageState};
 use eyre::Result;
 
 use crate::app::{App, AppState};
@@ -27,6 +28,12 @@ pub fn run() -> Result<()> {
     builder.default::<()>("splash_page", "templates/pages/splash.aml")?;
 
     builder.component(app::NAME, "templates/app.aml", App, AppState::default())?;
+    builder.component(
+        bb_message::NAME,
+        "templates/bb_components/message.aml",
+        BBMessage,
+        BBMessageState::default(),
+    )?;
 
     builder.finish(&mut backend, |runtime, backend| runtime.run(backend))?;
 

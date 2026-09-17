@@ -1,5 +1,7 @@
-@router [
-	route: state.route,
-	width: state.width,
-	height: state.height,
-	]
+vstack
+	@bb_message
+	@router [
+		route: state.route,
+		width: state.width,
+		height: state.height,
+		]
