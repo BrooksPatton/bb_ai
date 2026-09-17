@@ -1,2 +1,5 @@
 switch attributes.route
-	case "Splash": @splash_page
+	case "Splash": @splash_page [
+		width: attributes.width,
+		height: attributes.height
+	]

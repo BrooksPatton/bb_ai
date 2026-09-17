@@ -21,7 +21,6 @@
 - [x] component library
 - [ ] Design/Architecture
   - [x] Router
-  - [ ] Central data store
-  - [ ] Splash page
+  - [x] Splash page
   - [ ] Error page
   - [ ] Messaging
