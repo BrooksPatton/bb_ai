@@ -20,7 +20,7 @@
   - [x] To file
 - [x] component library
 - [ ] Design/Architecture
-  - [ ] Router
+  - [x] Router
   - [ ] Central data store
   - [ ] Splash page
   - [ ] Error page

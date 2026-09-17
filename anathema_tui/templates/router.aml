@@ -1,0 +1,2 @@
+switch attributes.route
+	case "Splash": @splash_page
