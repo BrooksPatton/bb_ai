@@ -1,9 +1,10 @@
 [workspace]
-members = ["anathema_tui", "logger"]
+members = ["anathema_components","anathema_tui", "logger"]
 resolver   = "3"
 
 [workspace.dependencies]
 eyre   = "0.6.14"
+anathema = "0.2.11"
 
 [workspace.lints.clippy]
 unwrap_used   = "warn"

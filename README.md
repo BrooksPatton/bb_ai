@@ -18,11 +18,10 @@
 - [x] Logging
   - [x] To console
   - [x] To file
-- [ ] component library
-  - [ ] Reset component library
-- [ ] Design
+- [x] component library
+- [ ] Design/Architecture
+  - [ ] Router
+  - [ ] Central data store
   - [ ] Splash page
   - [ ] Error page
   - [ ] Messaging
-  - [ ] Router
-  - [ ] Central data store
