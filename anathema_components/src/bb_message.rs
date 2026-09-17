@@ -27,6 +27,10 @@ impl Component for BBMessage {
                 state.message.set(msg);
                 state.theme.set("error".to_owned());
             }
+            BBMessageData::Normal(msg) => {
+                state.message.set(msg);
+                state.theme.set("normal".to_owned());
+            }
         }
 
         state.keep_for.set(KEEP_FOR);
@@ -53,4 +57,5 @@ pub struct BBMessageState {
 
 pub enum BBMessageData {
     Error(String),
+    Normal(String),
 }

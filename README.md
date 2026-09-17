@@ -22,5 +22,6 @@
 - [ ] Design/Architecture
   - [x] Router
   - [x] Splash page
-  - [x] Error page
-  - [ ] Messaging
+  - [x] Messaging
+    - [x] Error
+    - [x] Normal

@@ -44,7 +44,7 @@ impl Component for App {
             anathema::component::KeyCode::CtrlC => todo!(),
             anathema::component::KeyCode::Backspace => todo!(),
             anathema::component::KeyCode::Enter => {
-                let message = BBMessageData::Error("This is a simulated error message".to_owned());
+                let message = BBMessageData::Normal("This is a simulated message".to_owned());
                 context.components.by_name(bb_message::NAME).send(message);
             }
             anathema::component::KeyCode::Left => todo!(),

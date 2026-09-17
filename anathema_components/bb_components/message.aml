@@ -1,6 +1,9 @@
 let THEME = {
 	error: {
 		color: "red"
+	},
+	normal: {
+		color: "white"
 	}
 }
 
