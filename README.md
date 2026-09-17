@@ -15,9 +15,9 @@
 - [x] Github Actions set up for
   - [x] testing
   - [x] linting
-- [ ] Logging
+- [x] Logging
   - [x] To console
-  - [ ] To file
+  - [x] To file
 - [ ] component library
   - [ ] Reset component library
 - [ ] Design
