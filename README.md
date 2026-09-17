@@ -16,7 +16,7 @@
   - [x] testing
   - [x] linting
 - [ ] Logging
-  - [ ] To console
+  - [x] To console
   - [ ] To file
 - [ ] component library
   - [ ] Reset component library
