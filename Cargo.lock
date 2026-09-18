@@ -159,6 +159,7 @@ dependencies = [
  "anathema",
  "anathema_components",
  "eyre",
+ "logger",
 ]
 
 [[package]]

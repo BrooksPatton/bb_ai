@@ -3,12 +3,24 @@ use anathema::{
     state::{State, Value},
 };
 use anathema_components::bb_message::{self, BBMessageData};
+use logger::BBLog;
+use std::env;
 
 use crate::router::Route;
 
 pub const NAME: &str = "app";
 
-pub struct App;
+pub struct App {
+    logger: BBLog,
+}
+
+impl App {
+    pub fn new() -> Self {
+        let logger = BBLog::new().with_file_path("bb_ai.log");
+
+        Self { logger }
+    }
+}
 
 impl Component for App {
     type State = AppState;
@@ -19,23 +31,37 @@ impl Component for App {
         &mut self,
         state: &mut Self::State,
         mut _children: anathema::component::Children<'_, '_>,
-        context: anathema::component::Context<'_, '_, Self::State>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         let size = context.viewport.size();
         let width = size.width;
         let height = size.height;
+        let cwd = match env::current_dir() {
+            Ok(cwd) => cwd.to_string_lossy().to_string(),
+            Err(error) => {
+                self.logger.log(&error, true).ok();
+                context
+                    .components
+                    .by_name(bb_message::NAME)
+                    .send(BBMessageData::Error(error.to_string()));
+
+                String::new()
+            }
+        };
 
         state.route.set(Route::Splash.to_string());
         state.width.set(width);
         state.height.set(height);
+        state.model.set("mlx-community/Qwen3.8-27B-8bit".to_owned());
+        state.cwd.set(cwd);
     }
 
     fn on_key(
         &mut self,
         key: anathema::component::KeyEvent,
-        _state: &mut Self::State,
+        state: &mut Self::State,
         mut _children: anathema::component::Children<'_, '_>,
-        mut context: anathema::component::Context<'_, '_, Self::State>,
+        mut _context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         match key.code {
             anathema::component::KeyCode::Char(_) => todo!(),
@@ -44,8 +70,7 @@ impl Component for App {
             anathema::component::KeyCode::CtrlC => todo!(),
             anathema::component::KeyCode::Backspace => todo!(),
             anathema::component::KeyCode::Enter => {
-                let message = BBMessageData::Normal("This is a simulated message".to_owned());
-                context.components.by_name(bb_message::NAME).send(message);
+                state.route.set(Route::Home.to_string());
             }
             anathema::component::KeyCode::Left => todo!(),
             anathema::component::KeyCode::Right => todo!(),
@@ -77,4 +102,6 @@ pub struct AppState {
     width: Value<u16>,
     height: Value<u16>,
     message: Value<String>,
+    model: Value<String>,
+    cwd: Value<String>,
 }

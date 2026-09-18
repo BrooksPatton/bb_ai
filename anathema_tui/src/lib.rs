@@ -26,8 +26,15 @@ pub fn run() -> Result<()> {
 
     builder.default::<()>("router", "templates/router.aml")?;
     builder.default::<()>("splash_page", "templates/pages/splash.aml")?;
+    builder.default::<()>("home_page", "templates/pages/home.aml")?;
+    builder.default::<()>("app_bar", "templates/components/app_bar.aml")?;
 
-    builder.component(app::NAME, "templates/app.aml", App, AppState::default())?;
+    builder.component(
+        app::NAME,
+        "templates/app.aml",
+        App::new(),
+        AppState::default(),
+    )?;
     builder.component(
         bb_message::NAME,
         "templates/bb_components/message.aml",

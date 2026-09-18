@@ -25,3 +25,7 @@
   - [x] Messaging
     - [x] Error
     - [x] Normal
+
+## App Setup
+
+- [ ] choose ai model
