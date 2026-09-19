@@ -1,6 +1,13 @@
-switch attributes.route
-	case "Splash": @splash_page [
-		width: attributes.width,
-		height: attributes.height
-		]
-	case "Home": @home_page [model: attributes.model]
+vstack
+	switch attributes.route
+		case "Splash": @splash_page [
+			width: attributes.width,
+			height: attributes.height
+			]
+		case "Home": @home_page [
+			model: attributes.model,
+			width: attributes.width,
+			height: attributes.height,
+			ai_api_url: attributes.ai_api_url,
+			]
+		case "Config": @config_page

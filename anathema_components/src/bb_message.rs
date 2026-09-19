@@ -46,6 +46,10 @@ impl Component for BBMessage {
         let keep_for = state.keep_for.to_ref().saturating_sub(1);
         state.keep_for.set(keep_for);
     }
+
+    fn accept_focus(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Debug, State, Default)]

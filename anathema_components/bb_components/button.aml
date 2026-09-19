@@ -1,0 +1,11 @@
+let THEME = {
+	focus: {
+		color: "green"
+	},
+	nofocus: {
+		color: "white"
+	},
+}
+
+border [foreground: THEME[state.focus].color]
+	text  attributes.label

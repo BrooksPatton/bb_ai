@@ -1,0 +1,3 @@
+vstack
+	for message in state.messages
+		@message [role: state.roles[loop], value: message]

@@ -1,0 +1,6 @@
+vstack
+	text "Config page"
+	hstack
+		spacer
+		@bb_button (clicked->handle_cancel)[label: "Cancel"]
+		spacer

@@ -25,7 +25,7 @@ impl App {
 impl Component for App {
     type State = AppState;
 
-    type Message = ();
+    type Message = AppMessage;
 
     fn on_mount(
         &mut self,
@@ -49,11 +49,12 @@ impl Component for App {
             }
         };
 
-        state.route.set(Route::Splash.to_string());
+        state.route.set(Route::default().to_string());
         state.width.set(width);
         state.height.set(height);
         state.model.set("mlx-community/Qwen3.8-27B-8bit".to_owned());
         state.cwd.set(cwd);
+        state.ai_api_url.set("http://localhost:8080".to_owned());
     }
 
     fn on_key(
@@ -94,6 +95,35 @@ impl Component for App {
             anathema::component::KeyCode::KeypadBegin => todo!(),
         }
     }
+
+    fn accept_focus(&self) -> bool {
+        true
+    }
+
+    fn on_resize(
+        &mut self,
+        state: &mut Self::State,
+        mut children: anathema::component::Children<'_, '_>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        let size = context.viewport.size();
+        let width = size.width;
+        let height = size.height;
+        state.width.set(width);
+        state.height.set(height);
+    }
+
+    fn on_message(
+        &mut self,
+        message: Self::Message,
+        state: &mut Self::State,
+        mut children: anathema::component::Children<'_, '_>,
+        mut context: anathema::component::Context<'_, '_, Self::State>,
+    ) {
+        match message {
+            AppMessage::NavigateTo(route) => state.route.set(route.to_string()),
+        }
+    }
 }
 
 #[derive(Debug, State, Default)]
@@ -104,4 +134,9 @@ pub struct AppState {
     message: Value<String>,
     model: Value<String>,
     cwd: Value<String>,
+    ai_api_url: Value<String>,
+}
+
+pub enum AppMessage {
+    NavigateTo(Route),
 }

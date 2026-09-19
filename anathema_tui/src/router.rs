@@ -2,9 +2,10 @@ use std::fmt::Display;
 
 #[derive(Debug, Default)]
 pub enum Route {
-    #[default]
     Splash,
     Home,
+    #[default]
+    Config,
 }
 
 impl Display for Route {
@@ -12,6 +13,7 @@ impl Display for Route {
         let route = match self {
             Route::Splash => "Splash",
             Route::Home => "Home",
+            Route::Config => "Config",
         };
 
         write!(f, "{route}")

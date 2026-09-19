@@ -1,9 +1,10 @@
 vstack
 	@app_bar [cwd: state.cwd]
-	@bb_message
+	@bb_message [top: 2]
 	@router [
 		route: state.route,
 		width: state.width,
-		height: state.height,
+		height: state.height - 2,
 		model: state.model,
+		ai_api_url: state.ai_api_url
 		]

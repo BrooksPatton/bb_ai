@@ -1,0 +1,2 @@
+vstack
+	@model_info [ai_api_url: attributes.ai_api_url]
