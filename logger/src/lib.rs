@@ -23,12 +23,16 @@ impl BBLog {
         self
     }
 
-    pub fn with_file(mut self, path: impl AsRef<Path>) -> Result<Self> {
-        let file = File::options()
-            .create(true)
-            .truncate(false)
-            .append(true)
-            .open(path)?;
+    pub fn with_file(mut self, path: impl AsRef<Path>, truncate: bool) -> Result<Self> {
+        let file = if truncate {
+            File::options()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(path)?
+        } else {
+            File::options().create(true).append(true).open(path)?
+        };
 
         self.file_handle = Some(file);
 
