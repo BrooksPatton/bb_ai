@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 eyre.workspace = true
+async-openai = {version = "0.42.0", features = ["full"]}
 
 [lints]
 workspace = true

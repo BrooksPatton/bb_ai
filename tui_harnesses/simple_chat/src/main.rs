@@ -1,6 +1,9 @@
 use eyre::Result;
-use simple_chat::run;
+use simple_chat::HarnessHandle;
 
 fn main() -> Result<()> {
-    run()
+    let harness = HarnessHandle::new();
+    harness.send()?;
+
+    Ok(())
 }
