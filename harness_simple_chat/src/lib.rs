@@ -33,8 +33,4 @@ impl SimpleChatHarness {
 
         Ok(user_input.trim().to_owned())
     }
-
-    fn print_output(&self, output: &str) {
-        println!("{output}");
-    }
 }
