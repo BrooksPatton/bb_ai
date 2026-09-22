@@ -1,7 +1,0 @@
-vstack
-	spacer
-	hstack
-		spacer
-		text [text_align: "center"] "Brooks Builds AI Harness"
-		spacer
-	spacer

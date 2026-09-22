@@ -1,7 +1,0 @@
-border [sides: "bottom"]
-	hstack
-		text "BB AI"
-		spacer
-		text "cwd: "
-		text attributes.cwd
-		spacer

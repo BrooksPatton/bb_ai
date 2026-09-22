@@ -1,5 +1,5 @@
 [workspace]
-members = ["anathema_components","anathema_tui", "llm_api", "logger"]
+members = ["logger"]
 resolver   = "3"
 
 [workspace.dependencies]

@@ -1,8 +1,0 @@
-hstack
-	border [sides: "right", height: attributes.height, width: attributes.width - 35]
-		vstack
-			@message_history
-			spacer
-			@bb_input (Submit -> promp_submitted) [width: attributes.width - 36]
-	@info_column [ai_api_url: attributes.ai_api_url]
-
