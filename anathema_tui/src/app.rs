@@ -121,8 +121,13 @@ impl Component for App {
         mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
         match message {
-            AppMessage::NavigateTo(route) => state.route.set(route.to_string()),
-        }
+            AppMessage::NavigateTo(route) => {
+                state.route.set(route.to_string());
+            }
+            AppMessage::LogError(message) => {
+                self.logger.log(message, true).ok();
+            }
+        };
     }
 }
 
@@ -139,4 +144,5 @@ pub struct AppState {
 
 pub enum AppMessage {
     NavigateTo(Route),
+    LogError(String),
 }

@@ -10,6 +10,7 @@ use anathema::{
 };
 use anathema_components::{
     bb_button::{self, BBButton, BBButtonState},
+    bb_checkbox::{self, BBCheckbox, BBCheckboxState},
     bb_input::{self, BBInput, BBInputState},
     bb_message::{self, BBMessage, BBMessageState},
 };
@@ -58,12 +59,6 @@ pub fn run() -> Result<()> {
         BBMessage,
         BBMessageState::default(),
     )?;
-    builder.component(
-        bb_input::NAME,
-        "templates/bb_components/input.aml",
-        BBInput::default(),
-        BBInputState::default(),
-    )?;
     builder.component(home::NAME, "templates/pages/home.aml", HomePage, ())?;
     builder.component(
         config::NAME,
@@ -89,6 +84,18 @@ pub fn run() -> Result<()> {
         "templates/bb_components/button.aml",
         || BBButton,
         BBButtonState::default,
+    )?;
+    builder.prototype(
+        bb_input::NAME,
+        "templates/bb_components/input.aml",
+        BBInput::default,
+        BBInputState::default,
+    )?;
+    builder.prototype(
+        bb_checkbox::NAME,
+        "templates/bb_components/checkbox.aml",
+        || BBCheckbox,
+        BBCheckboxState::default,
     )?;
 
     builder.finish(&mut backend, |runtime, backend| runtime.run(backend))?;

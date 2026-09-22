@@ -1,5 +1,18 @@
 vstack
-	text "Config page"
+	hstack
+		spacer
+		border [sides: "bottom"]
+			text "Config"
+		spacer
+	border
+		vstack
+			hstack
+				spacer
+				text "Huggingface"
+				spacer
+			@bb_button (clicked->handle_check_hugginface_connection) [label: "Check Hugginface Connection"]
+			@bb_checkbox (updated->handle_huggingface_active) [label: "Active"]
+	text "Local"
 	hstack
 		spacer
 		@bb_button (clicked->handle_cancel)[label: "Cancel"]

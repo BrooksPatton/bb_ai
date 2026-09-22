@@ -1,5 +1,5 @@
 [package]
-name = "mlx_vlm"
+name = "llm_api"
 version = "0.1.0"
 edition = "2024"
 

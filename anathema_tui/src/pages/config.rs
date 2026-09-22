@@ -1,5 +1,8 @@
-use anathema::{component::Component, state::State};
-use anathema_components::bb_button::BBButtonEvent;
+use anathema::{
+    component::Component,
+    state::{State, Value},
+};
+use anathema_components::{bb_button::BBButtonEvent, bb_checkbox::BBCheckboxEvent};
 
 use crate::app::{self, AppMessage};
 
@@ -19,14 +22,41 @@ impl Component for ConfigPage {
         mut children: anathema::component::Children<'_, '_>,
         mut context: anathema::component::Context<'_, '_, Self::State>,
     ) {
-        if let Some(_event) = event.data_checked::<BBButtonEvent>() {
-            context
-                .components
-                .by_name(app::NAME)
-                .send(AppMessage::NavigateTo(crate::router::Route::Home));
+        match event.name() {
+            "handle_cancel" => {
+                context
+                    .components
+                    .by_name(app::NAME)
+                    .send(AppMessage::NavigateTo(crate::router::Route::Home));
+            }
+            "handle_check_hugginface_connection" => {
+                //
+            }
+            "handle_huggingface_active" => match event.data::<BBCheckboxEvent>() {
+                BBCheckboxEvent::Checked => {
+                    state.huggingface_active.set(true);
+                    state.dirty.set(true);
+                    context
+                        .components
+                        .by_name(app::NAME)
+                        .send(AppMessage::LogError("activating huggingface".to_owned()));
+                }
+                BBCheckboxEvent::Unchecked => {
+                    state.huggingface_active.set(false);
+                    state.dirty.set(true);
+                    context
+                        .components
+                        .by_name(app::NAME)
+                        .send(AppMessage::LogError("de-activating huggingface".to_owned()));
+                }
+            },
+            _ => (),
         }
     }
 }
 
 #[derive(State, Default)]
-pub struct ConfigPageState {}
+pub struct ConfigPageState {
+    huggingface_active: Value<bool>,
+    dirty: Value<bool>,
+}
