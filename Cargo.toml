@@ -1,11 +1,11 @@
 [workspace]
-members = ["harness_simple_chat","logger"]
+members = ["tui_harnesses/simple_chat"]
 resolver   = "3"
 
 [workspace.dependencies]
 eyre   = "0.6.14"
 anathema = "0.2.11"
-logger = {path = "./logger/"}
+tokio = {version = "1.53.1", features = ["full"]}
 
 [workspace.lints.clippy]
 unwrap_used   = "warn"
