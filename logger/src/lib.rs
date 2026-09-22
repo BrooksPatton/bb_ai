@@ -1,16 +1,11 @@
 use eyre::Result;
-use std::{
-    fmt::Display,
-    fs::File,
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::{fmt::Display, fs::File, io::Write, path::Path};
 
 #[derive(Default)]
 pub struct BBLog {
     pub std_out: Option<Box<dyn Write>>,
     pub std_err: Option<Box<dyn Write>>,
-    pub file_path: Option<PathBuf>,
+    pub file_handle: Option<File>,
 }
 
 impl BBLog {
@@ -28,9 +23,16 @@ impl BBLog {
         self
     }
 
-    pub fn with_file_path(mut self, path: impl AsRef<Path>) -> Self {
-        self.file_path = Some(path.as_ref().to_path_buf());
-        self
+    pub fn with_file(mut self, path: impl AsRef<Path>) -> Result<Self> {
+        let file = File::options()
+            .create(true)
+            .truncate(false)
+            .append(true)
+            .open(path)?;
+
+        self.file_handle = Some(file);
+
+        Ok(self)
     }
 
     /// Log out to wherever we want to
@@ -45,12 +47,7 @@ impl BBLog {
             }
         }
 
-        if let Some(file_path) = &self.file_path {
-            let mut file = File::options()
-                .write(true)
-                .create(true)
-                .truncate(false)
-                .open(file_path)?;
+        if let Some(file) = &mut self.file_handle {
             writeln!(file, "{message}")?;
 
             file.flush()?;

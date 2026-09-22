@@ -43,7 +43,7 @@ fn should_log_to_standard_error() -> Result<()> {
 #[test]
 fn should_log_to_file() -> Result<()> {
     let file_path = "test_log_file.log";
-    let mut logger = BBLog::new().with_file_path(file_path);
+    let mut logger = BBLog::new().with_file(file_path)?;
     let message = "Hello world";
 
     logger.log(message, false)?;
