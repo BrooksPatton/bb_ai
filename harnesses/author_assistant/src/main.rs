@@ -1,6 +1,8 @@
 use actors::{
-    context_history::ContextHistoryHandle, send_to_llm::SendToLLMHandle,
-    std_out_writer::StdOutWriterHandle, tools::read_file::ReadFileToolHandle,
+    context_history::ContextHistoryHandle,
+    send_to_llm::SendToLLMHandle,
+    std_out_writer::StdOutWriterHandle,
+    tools::{ls::LSToolHandle, read_file::ReadFileToolHandle},
 };
 use async_openai::{Client, config::OpenAIConfig};
 use clap::Parser;
@@ -22,7 +24,11 @@ async fn main() -> Result<()> {
     let context_history = ContextHistoryHandle::new();
     let std_out_writer = StdOutWriterHandle::new();
     let read_file_tool = ReadFileToolHandle::new();
-    let tool_definitions = vec![read_file_tool.get_definition().await];
+    let ls_tool = LSToolHandle::new();
+    let tool_definitions = vec![
+        read_file_tool.get_definition().await,
+        ls_tool.get_definition().await,
+    ];
     let send_to_llm = SendToLLMHandle::new(openai_client, Some(std_out_writer), tool_definitions);
     let system_prompt = "Act as an author assistant, you have access to a semi-organize wiki containing information, chapters, and rough draftr for his multiverse. Use tools, taking your time to deep research what is needed to answer his question. Then respond appropriately.";
     let model = env::var("AI_MODEL")?;

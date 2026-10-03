@@ -20,9 +20,9 @@ This harness is for helping me write by researching and answering questions abou
   - [x] Send request to LLM
   - [x] Stream response to standard out
   - [x] Set system prompt
-- [ ] Advertise tools
+- [x] Advertise tools
   - [x] Read file
-  - [ ] List all files in directory
+  - [x] List all files in directory
 - [ ] Implement tools
   - [x] Read file
   - [ ] List all files in directory
