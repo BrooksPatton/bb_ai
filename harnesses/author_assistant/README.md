@@ -23,9 +23,9 @@ This harness is for helping me write by researching and answering questions abou
 - [x] Advertise tools
   - [x] Read file
   - [x] List all files in directory
-- [ ] Implement tools
+- [x] Implement tools
   - [x] Read file
-  - [ ] List all files in directory
+  - [x] List all files in directory
 - [ ] Multi-step
   - [ ] Set up memory
   - [ ] loop until done

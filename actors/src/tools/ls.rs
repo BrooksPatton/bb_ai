@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::path::PathBuf;
 use tokio::{
-    fs::read_to_string,
     spawn,
     sync::{mpsc, oneshot},
 };

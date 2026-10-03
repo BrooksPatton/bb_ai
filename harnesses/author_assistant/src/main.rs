@@ -59,18 +59,28 @@ async fn main() -> Result<()> {
                 };
 
                 for tool_call in tool_calls {
-                    if tool_call.function.name == read_file_tool.get_name().await {
-                        let result = match read_file_tool
+                    let tool_call_result = if tool_call.function.name
+                        == read_file_tool.get_name().await
+                    {
+                        match read_file_tool
                             .read_file(&tool_call.function.arguments)
                             .await
                         {
                             Ok(content) => content,
                             Err(error) => error,
-                        };
-                        context_history
-                            .push(Message::new_tool(result, tool_call.id.clone()))
-                            .await;
-                    }
+                        }
+                    } else if tool_call.function.name == ls_tool.get_name().await {
+                        match ls_tool.ls(&tool_call.function.arguments).await {
+                            Ok(result) => result,
+                            Err(error) => error,
+                        }
+                    } else {
+                        "Error, the tool you tried to call doesn't seem to exist, if you think this is incorrect, tell the user to double check the ai harness code".to_owned()
+                    };
+
+                    context_history
+                        .push(Message::new_tool(tool_call_result, tool_call.id.clone()))
+                        .await;
                 }
             }
         }
