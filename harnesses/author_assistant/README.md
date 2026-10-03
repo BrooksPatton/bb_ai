@@ -21,10 +21,10 @@ This harness is for helping me write by researching and answering questions abou
   - [x] Stream response to standard out
   - [x] Set system prompt
 - [ ] Advertise tools
-  - [ ] Read file
+  - [x] Read file
   - [ ] List all files in directory
 - [ ] Implement tools
-  - [ ] Read file
+  - [x] Read file
   - [ ] List all files in directory
 - [ ] Multi-step
   - [ ] Set up memory

@@ -1,6 +1,6 @@
 use actors::{
     context_history::ContextHistoryHandle, send_to_llm::SendToLLMHandle,
-    std_out_writer::StdOutWriterHandle,
+    std_out_writer::StdOutWriterHandle, tools::read_file::ReadFileToolHandle,
 };
 use async_openai::{Client, config::OpenAIConfig};
 use clap::Parser;
@@ -21,7 +21,9 @@ async fn main() -> Result<()> {
     let openai_client = Client::with_config(openai_config);
     let context_history = ContextHistoryHandle::new();
     let std_out_writer = StdOutWriterHandle::new();
-    let send_to_llm = SendToLLMHandle::new(openai_client, Some(std_out_writer));
+    let read_file_tool = ReadFileToolHandle::new();
+    let tool_definitions = vec![read_file_tool.get_definition().await];
+    let send_to_llm = SendToLLMHandle::new(openai_client, Some(std_out_writer), tool_definitions);
     let system_prompt = "Act as an author assistant, you have access to a semi-organize wiki containing information, chapters, and rough draftr for his multiverse. Use tools, taking your time to deep research what is needed to answer his question. Then respond appropriately.";
     let model = env::var("AI_MODEL")?;
 
@@ -29,9 +31,44 @@ async fn main() -> Result<()> {
         .push(Message::new_system(system_prompt))
         .await;
     context_history.push(Message::new_user(args.prompt)).await;
-    let llm_response = send_to_llm.send(context_history.clone(), model).await?;
 
-    dbg!(llm_response);
+    loop {
+        let llm_response = send_to_llm
+            .send(context_history.clone(), model.clone())
+            .await?;
+
+        context_history.push(llm_response.message.clone()).await;
+
+        match llm_response.finish_reason {
+            actors::send_to_llm::FinishReason::Stop => break,
+            actors::send_to_llm::FinishReason::ToolCalls => {
+                let Some(tool_calls) = llm_response.message.tool_calls.as_ref() else {
+                    context_history
+                        .push(Message::new_tool(
+                            "Error: stop reason is tool calls, but you didn't call any tools",
+                            "".to_owned(),
+                        ))
+                        .await;
+                    continue;
+                };
+
+                for tool_call in tool_calls {
+                    if tool_call.function.name == read_file_tool.get_name().await {
+                        let result = match read_file_tool
+                            .read_file(&tool_call.function.arguments)
+                            .await
+                        {
+                            Ok(content) => content,
+                            Err(error) => error,
+                        };
+                        context_history
+                            .push(Message::new_tool(result, tool_call.id.clone()))
+                            .await;
+                    }
+                }
+            }
+        }
+    }
 
     Ok(())
 }
