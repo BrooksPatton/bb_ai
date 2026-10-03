@@ -1,0 +1,16 @@
+[package]
+name = "author_assistant"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+eyre.workspace = true
+tokio.workspace = true
+clap.workspace = true
+dotenvy.workspace = true
+actors = {path = "../../actors"}
+async-openai.workspace = true
+shared_types = {path = "../../shared_types"}
+
+[lints]
+workspace = true
