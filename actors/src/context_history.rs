@@ -20,6 +20,12 @@ enum Command {
     GetAll {
         respond_to: oneshot::Sender<Vec<Message>>,
     },
+    GetLast {
+        respond_to: oneshot::Sender<Option<Message>>,
+    },
+    GetAllWithContent {
+        respond_to: oneshot::Sender<Vec<Message>>,
+    },
 }
 
 impl ContextHistory {
@@ -43,6 +49,27 @@ impl ContextHistory {
                 }
                 Command::GetAll { respond_to } => {
                     if let Err(error) = respond_to.send(self.history.clone()) {
+                        eprintln!("{error:?}");
+                    }
+                }
+                Command::GetLast { respond_to } => {
+                    if let Err(error) = respond_to.send(self.history.last().cloned()) {
+                        eprintln!("{error:?}");
+                    }
+                }
+                Command::GetAllWithContent { respond_to } => {
+                    let messages_with_content = self
+                        .history
+                        .iter()
+                        .filter(|message| {
+                            message
+                                .content
+                                .as_ref()
+                                .is_some_and(|content| !content.is_empty())
+                        })
+                        .cloned()
+                        .collect();
+                    if let Err(error) = respond_to.send(messages_with_content) {
                         eprintln!("{error:?}");
                     }
                 }
@@ -90,6 +117,26 @@ impl ContextHistoryHandle {
         }
 
         recv.await.expect("getting all messages from history")
+    }
+
+    pub async fn get_last(&self) -> Option<Message> {
+        let (respond_to, recv) = oneshot::channel();
+        let command = Command::GetLast { respond_to };
+        if let Err(error) = self.sender.send(command).await {
+            eprintln!("{error:?}");
+        }
+
+        recv.await.expect("getting response from actor")
+    }
+
+    pub async fn get_messages_with_content(&self) -> Vec<Message> {
+        let (respond_to, recv) = oneshot::channel();
+        let command = Command::GetAllWithContent { respond_to };
+        if let Err(error) = self.sender.send(command).await {
+            eprintln!("{error:?}");
+        }
+
+        recv.await.expect("getting response from actor")
     }
 }
 

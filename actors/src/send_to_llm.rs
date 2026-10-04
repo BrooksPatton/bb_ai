@@ -17,7 +17,6 @@ struct SendToLLM {
     receiver: mpsc::Receiver<Command>,
     client: Client<OpenAIConfig>,
     stream_output: Option<StdOutWriterHandle>,
-    tool_definitions: Vec<Value>,
 }
 
 enum Command {
@@ -25,6 +24,7 @@ enum Command {
         respond_to: oneshot::Sender<SendToLLMResponse>,
         context_history: ContextHistoryHandle,
         model: String,
+        tool_definitions: Vec<Value>,
     },
 }
 
@@ -39,13 +39,11 @@ impl SendToLLM {
         receiver: mpsc::Receiver<Command>,
         client: Client<OpenAIConfig>,
         stream_output: Option<StdOutWriterHandle>,
-        tool_definitions: Vec<Value>,
     ) -> Self {
         Self {
             receiver,
             client,
             stream_output,
-            tool_definitions,
         }
     }
 
@@ -56,8 +54,11 @@ impl SendToLLM {
                     respond_to,
                     context_history,
                     model,
+                    tool_definitions,
                 } => {
-                    let response = self.handle_send(context_history, model).await;
+                    let response = self
+                        .handle_send(context_history, model, tool_definitions)
+                        .await;
                     if let Err(error) = respond_to.send(response) {
                         eprintln!("Error responding after sending to llm: {error:?}");
                     }
@@ -70,13 +71,15 @@ impl SendToLLM {
         &mut self,
         context_history: ContextHistoryHandle,
         model: String,
+        tool_definitions: Vec<Value>,
     ) -> SendToLLMResponse {
         let messages = context_history.get_all().await;
         let body = json! ({
             "messages": messages,
             "model": model,
             "stream": true,
-            "tools": &self.tool_definitions,
+            "tools": tool_definitions,
+            "max_tokens": 32768,
         });
         let mut response: Pin<Box<dyn Stream<Item = Result<LlmResponse, OpenAIError>> + Send>> =
             self.client
@@ -144,13 +147,9 @@ pub struct SendToLLMHandle {
 }
 
 impl SendToLLMHandle {
-    pub fn new(
-        client: Client<OpenAIConfig>,
-        stream_output: Option<StdOutWriterHandle>,
-        tool_definitions: Vec<Value>,
-    ) -> Self {
+    pub fn new(client: Client<OpenAIConfig>, stream_output: Option<StdOutWriterHandle>) -> Self {
         let (sender, receiver) = mpsc::channel(8);
-        let send_to_llm = SendToLLM::new(receiver, client, stream_output, tool_definitions);
+        let send_to_llm = SendToLLM::new(receiver, client, stream_output);
 
         spawn(send_to_llm.run());
 
@@ -161,12 +160,14 @@ impl SendToLLMHandle {
         &self,
         context_history: ContextHistoryHandle,
         model: String,
+        tool_definitions: Vec<Value>,
     ) -> Result<SendToLLMResponse, RecvError> {
         let (respond_to, recv) = oneshot::channel();
         let command = Command::Send {
             respond_to,
             context_history,
             model,
+            tool_definitions,
         };
         if let Err(error) = self.sender.send(command).await {
             eprintln!("{error:?}");
@@ -201,6 +202,7 @@ pub enum FinishReason {
     Stop,
     #[serde(rename = "tool_calls")]
     ToolCalls,
+    Length,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

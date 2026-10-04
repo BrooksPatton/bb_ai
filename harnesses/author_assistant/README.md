@@ -26,9 +26,9 @@ This harness is for helping me write by researching and answering questions abou
 - [x] Implement tools
   - [x] Read file
   - [x] List all files in directory
-- [ ] Multi-step
-  - [ ] Set up memory
-  - [ ] loop until done
+- [x] Multi-step
+  - [x] Set up memory
+  - [x] loop until done
 - [ ] Set up judge
   - [ ] Review initial prompt and end result, determine if complete or keep trying
   
