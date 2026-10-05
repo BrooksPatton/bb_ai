@@ -1,3 +1,4 @@
+use colored::Colorize;
 use shared_types::message::Message;
 use tokio::{
     spawn,
@@ -26,6 +27,9 @@ enum Command {
     GetAllWithContent {
         respond_to: oneshot::Sender<Vec<Message>>,
     },
+    GetLastWithContent {
+        respond_to: oneshot::Sender<Option<Message>>,
+    },
 }
 
 impl ContextHistory {
@@ -43,19 +47,17 @@ impl ContextHistory {
                     message,
                 } => {
                     self.history.push(message);
-                    if let Err(error) = respond_to.send(()) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to.send(()).expect("sending response from actor");
                 }
                 Command::GetAll { respond_to } => {
-                    if let Err(error) = respond_to.send(self.history.clone()) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to
+                        .send(self.history.clone())
+                        .expect("sending response from actor");
                 }
                 Command::GetLast { respond_to } => {
-                    if let Err(error) = respond_to.send(self.history.last().cloned()) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to
+                        .send(self.history.last().cloned())
+                        .expect("sending response from ");
                 }
                 Command::GetAllWithContent { respond_to } => {
                     let messages_with_content = self
@@ -69,14 +71,29 @@ impl ContextHistory {
                         })
                         .cloned()
                         .collect();
-                    if let Err(error) = respond_to.send(messages_with_content) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to
+                        .send(messages_with_content)
+                        .expect("sending response from actor");
                 }
+                Command::GetLastWithContent { respond_to } => respond_to
+                    .send(self.handle_get_last_with_context().await)
+                    .expect("Sending resonse to get last with content command"),
             }
         }
 
-        println!("Context History actor closed");
+        println!("{}", "Context History actor closed".blue());
+    }
+
+    async fn handle_get_last_with_context(&self) -> Option<Message> {
+        self.history
+            .iter()
+            .rfind(|message| {
+                message
+                    .content
+                    .as_ref()
+                    .is_some_and(|content| !content.is_empty())
+            })
+            .cloned()
     }
 }
 
@@ -101,20 +118,20 @@ impl ContextHistoryHandle {
             respond_to,
             message,
         };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-        }
-        if let Err(error) = recv.await {
-            eprintln!("{error:?}");
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("sending command to actor");
+        recv.await.expect("Getting response from actor")
     }
 
     pub async fn get_all(&self) -> Vec<Message> {
         let (respond_to, recv) = oneshot::channel();
         let command = Command::GetAll { respond_to };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("Sending command to actor");
 
         recv.await.expect("getting all messages from history")
     }
@@ -122,9 +139,10 @@ impl ContextHistoryHandle {
     pub async fn get_last(&self) -> Option<Message> {
         let (respond_to, recv) = oneshot::channel();
         let command = Command::GetLast { respond_to };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("Sending command to actor");
 
         recv.await.expect("getting response from actor")
     }
@@ -132,11 +150,25 @@ impl ContextHistoryHandle {
     pub async fn get_messages_with_content(&self) -> Vec<Message> {
         let (respond_to, recv) = oneshot::channel();
         let command = Command::GetAllWithContent { respond_to };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("Sending command to actor");
 
         recv.await.expect("getting response from actor")
+    }
+
+    pub async fn get_last_with_content(&self) -> Option<Message> {
+        let (respond_to, recv) = oneshot::channel();
+        let command = Command::GetLastWithContent { respond_to };
+
+        self.sender
+            .send(command)
+            .await
+            .expect("sending get last with content command to actor");
+
+        recv.await
+            .expect("getting last message with content from context history actor")
     }
 }
 

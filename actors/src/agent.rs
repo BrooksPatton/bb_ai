@@ -1,14 +1,14 @@
+use crate::{
+    context_history::ContextHistoryHandle,
+    send_to_llm::SendToLLMHandle,
+    tools::{ls::LSToolHandle, read_file::ReadFileToolHandle},
+};
+use colored::Colorize;
 use shared_types::message::Message;
 use std::fmt::Display;
 use tokio::{
     spawn,
     sync::{mpsc, oneshot},
-};
-
-use crate::{
-    context_history::ContextHistoryHandle,
-    send_to_llm::SendToLLMHandle,
-    tools::{ls::LSToolHandle, read_file::ReadFileToolHandle},
 };
 
 struct Agent {
@@ -19,8 +19,10 @@ struct Agent {
     ls_tool: Option<LSToolHandle>,
     read_file_tool: Option<ReadFileToolHandle>,
     model: String,
+    name: String,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl Agent {
     pub fn new(
         receiver: mpsc::Receiver<Command>,
@@ -30,6 +32,7 @@ impl Agent {
         ls_tool: Option<LSToolHandle>,
         read_file_tool: Option<ReadFileToolHandle>,
         model: String,
+        name: String,
     ) -> Self {
         Self {
             receiver,
@@ -39,10 +42,13 @@ impl Agent {
             ls_tool,
             read_file_tool,
             model,
+            name,
         }
     }
 
     pub async fn run(mut self) {
+        println!("{}", format!("{} running", self.name).blue());
+
         while let Some(command) = self.receiver.recv().await {
             match command {
                 Command::Prompt {
@@ -53,14 +59,21 @@ impl Agent {
                         .send(self.handle_prompt(message).await)
                         .expect("responding to prompt command");
                 }
+                Command::AddMessageToContext {
+                    respond_to,
+                    message,
+                } => {
+                    self.handle_add_message_to_context(message).await;
+                    respond_to.send(()).expect("Responding to command");
+                }
             }
         }
     }
 
-    async fn handle_prompt(&mut self, message: Message) -> AgentResponse {
-        let mut tool_definitions = Vec::new();
+    async fn handle_prompt(&mut self, prompt: Message) -> AgentResponse {
+        self.context.push(prompt.clone()).await;
 
-        self.context.push(message).await;
+        let mut tool_definitions = Vec::new();
         if let Some(read_file) = self.read_file_tool.as_ref() {
             tool_definitions.push(read_file.get_definition().await);
         }
@@ -68,12 +81,104 @@ impl Agent {
             tool_definitions.push(ls.get_definition().await);
         }
 
-        self.send_to_llm
-            .send(self.context.clone(), self.model.clone(), tool_definitions)
-            .await
-            .expect("Sending message to llm");
+        loop {
+            println!("{}", format!("Agent {} looping", self.name).blue());
+            let result = self
+                .send_to_llm
+                .send(
+                    self.context.clone(),
+                    self.model.clone(),
+                    tool_definitions.clone(),
+                )
+                .await
+                .expect("Sending message to llm");
 
-        AgentResponse {}
+            self.context.push(result.message.clone()).await;
+
+            match result.finish_reason {
+                crate::send_to_llm::FinishReason::Stop => {
+                    let last_message = self
+                        .context
+                        .get_last_with_content()
+                        .await
+                        .unwrap_or_else(|| Message::new_assistant(""));
+
+                    if let Some(judge) = &self.judge {
+                        let judge_result = judge
+                            .prompt(format!(
+                                "full message history sent to agent: ```{:?}```\n\ndeliverable: ```{last_message}```",
+
+                                self.context.get_all().await
+                            ))
+                            .await;
+
+                        if judge_result.finished {
+                            println!("{}", "Judge determined we're done".blue());
+
+                            return AgentResponse {
+                                finished: true,
+                                message: last_message,
+                            };
+                        } else {
+                            println!(
+                                "{} {}",
+                                "Judge determined we need to try again: ".blue(),
+                                judge_result.message
+                            );
+
+                            self.context.push(judge_result.message).await;
+                            continue;
+                        }
+                    }
+
+                    return AgentResponse {
+                        finished: true,
+                        message: last_message,
+                    };
+                }
+                crate::send_to_llm::FinishReason::ToolCalls => {
+                    let Some(tool_calls) = result.message.tool_calls.as_ref() else {
+                        self.context.push(Message::new_tool("Stop reason was tool calls, but there weren't any tools called. Please try again.", "".to_owned())).await;
+                        continue;
+                    };
+
+                    for tool_call in tool_calls {
+                        let tool_call_name = &tool_call.function.name;
+                        if let Some(read_file) = self.read_file_tool.as_ref()
+                            && read_file.get_name().await == *tool_call_name
+                        {
+                            let read_file_result =
+                                match read_file.read_file(&tool_call.function.arguments).await {
+                                    Ok(message) => message,
+                                    Err(message) => message,
+                                };
+                            self.context
+                                .push(Message::new_tool(read_file_result, tool_call.id.clone()))
+                                .await;
+                        }
+                        if let Some(ls) = self.ls_tool.as_ref()
+                            && ls.get_name().await == *tool_call_name
+                        {
+                            let ls_result = match ls.ls(&tool_call.function.arguments).await {
+                                Ok(message) => message,
+                                Err(message) => message,
+                            };
+                            self.context
+                                .push(Message::new_tool(ls_result, tool_call.id.clone()))
+                                .await;
+                        }
+                    }
+                }
+                crate::send_to_llm::FinishReason::Length => {
+                    self.context.push(result.message).await;
+                    continue;
+                }
+            }
+        }
+    }
+
+    async fn handle_add_message_to_context(&self, message: Message) {
+        self.context.push(message).await
     }
 }
 
@@ -82,10 +187,17 @@ enum Command {
         respond_to: oneshot::Sender<AgentResponse>,
         message: Message,
     },
+    AddMessageToContext {
+        respond_to: oneshot::Sender<()>,
+        message: Message,
+    },
 }
 
 #[derive(Debug)]
-pub struct AgentResponse {}
+pub struct AgentResponse {
+    finished: bool,
+    message: Message,
+}
 
 pub struct AgentHandle {
     sender: mpsc::Sender<Command>,
@@ -98,11 +210,12 @@ impl AgentHandle {
         ls_tool: Option<LSToolHandle>,
         read_file_tool: Option<ReadFileToolHandle>,
         model: String,
+        judge: Option<AgentHandle>,
+        name: impl Display,
     ) -> Self {
         let (sender, receiver) = mpsc::channel(8);
         let system_message = Message::new_system(system_prompt);
         let context = ContextHistoryHandle::new();
-        let judge = None;
         let agent = Agent::new(
             receiver,
             send_to_llm,
@@ -111,6 +224,7 @@ impl AgentHandle {
             ls_tool,
             read_file_tool,
             model,
+            name.to_string(),
         );
 
         context.push(system_message).await;
@@ -124,6 +238,21 @@ impl AgentHandle {
         let command = Command::Prompt {
             respond_to,
             message: Message::new_user(prompt),
+        };
+
+        self.sender
+            .send(command)
+            .await
+            .expect("sending command to agent");
+
+        recv.await.expect("getting response from agent actor")
+    }
+
+    pub async fn add_message_to_context(&self, message: Message) {
+        let (respond_to, recv) = oneshot::channel();
+        let command = Command::AddMessageToContext {
+            respond_to,
+            message,
         };
 
         self.sender

@@ -10,6 +10,7 @@ shared_types = {path = "../shared_types"}
 serde_json.workspace = true
 futures.workspace = true
 serde.workspace = true
+colored.workspace = true
 
 [lints]
 workspace = true

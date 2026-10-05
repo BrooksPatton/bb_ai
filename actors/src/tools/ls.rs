@@ -1,3 +1,4 @@
+use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::path::PathBuf;
@@ -35,19 +36,19 @@ impl LSTool {
         while let Some(command) = self.receiver.recv().await {
             match command {
                 Command::LS { respond_to, path } => {
-                    if let Err(error) = respond_to.send(self.handle_ls(path).await) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to
+                        .send(self.handle_ls(path).await)
+                        .expect("Sending response from actor");
                 }
                 Command::GetDefinition { respond_to } => {
-                    if let Err(error) = respond_to.send(self.define_tool()) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to
+                        .send(self.define_tool())
+                        .expect("Sending response from actor");
                 }
                 Command::GetName { respond_to } => {
-                    if let Err(error) = respond_to.send(self.name.clone()) {
-                        eprintln!("{error:?}");
-                    }
+                    respond_to
+                        .send(self.name.clone())
+                        .expect("Sending response from actor");
                 }
             }
         }
@@ -64,14 +65,14 @@ impl LSTool {
                     let name = match dir_entry_name.into_string() {
                         Ok(name) => name,
                         Err(error) => {
-                            eprintln!("{error:?}");
+                            eprintln!("{}", format!("{error:?}").red());
                             continue;
                         }
                     };
                     let metadata = match dir_entry.metadata().await {
                         Ok(metadata) => metadata,
                         Err(error) => {
-                            eprintln!("{error:?}");
+                            eprintln!("{}", format!("{error:?}").red());
                             continue;
                         }
                     };
@@ -89,7 +90,7 @@ impl LSTool {
                 Ok(format!("{entries:?}"))
             }
             Err(error) => {
-                eprintln!("{error:?}");
+                eprintln!("{}", format!("{error:?}").red());
                 Err(format!("There was an error running the ls tool: {error:?}"))
             }
         }
@@ -116,6 +117,7 @@ impl LSTool {
     }
 }
 
+#[derive(Clone)]
 pub struct LSToolHandle {
     sender: mpsc::Sender<Command>,
 }
@@ -135,28 +137,23 @@ impl LSToolHandle {
         let args: LSToolArgs = match serde_json::from_str(args) {
             Ok(args) => args,
             Err(error) => {
-                eprintln!("{error:?}");
+                eprintln!("{}", format!("{error:?}").red());
                 return Err(format!(
                     "There was an error parsing the tool arguments: {error:?}"
                 ));
             }
         };
+        println!("{}", format!("ls tool run with args: {args:?}").green());
         let command = Command::LS {
             respond_to,
             path: args.path,
         };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-            return Err("There was an undefined error sending a message to the function running the tool. The ls tool seems to be broken unfortunately".to_owned());
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("Sending command to actor");
 
-        match recv.await {
-            Ok(file_content) => file_content,
-            Err(error) => {
-                eprintln!("{error:?}");
-                Err("There was a problem getting the response back from the function running the ls tool.".to_owned())
-            }
-        }
+        recv.await.expect("Getting result from actor")
     }
 
     pub async fn get_definition(&self) -> Value {

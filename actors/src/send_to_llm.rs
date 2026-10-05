@@ -1,5 +1,6 @@
 use crate::{context_history::ContextHistoryHandle, std_out_writer::StdOutWriterHandle};
 use async_openai::{Client, config::OpenAIConfig, error::OpenAIError};
+use colored::Colorize;
 use futures::{Stream, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -59,9 +60,7 @@ impl SendToLLM {
                     let response = self
                         .handle_send(context_history, model, tool_definitions)
                         .await;
-                    if let Err(error) = respond_to.send(response) {
-                        eprintln!("Error responding after sending to llm: {error:?}");
-                    }
+                    respond_to.send(response).expect("Responding from actor");
                 }
             }
         }
@@ -96,7 +95,7 @@ impl SendToLLM {
             let next_chunk = match next_chunk {
                 Ok(next_chunk) => next_chunk,
                 Err(error) => {
-                    eprintln!("{error:?}");
+                    eprintln!("{}", format!("{error:?}").red());
                     continue;
                 }
             };
@@ -104,6 +103,12 @@ impl SendToLLM {
             message += message_part.clone();
 
             if let Some(token) = message_part.reasoning_content.clone() {
+                let token = token.trim_matches('\n').to_owned();
+
+                if token.is_empty() {
+                    continue;
+                }
+
                 if !started {
                     if let Some(stream_output) = &self.stream_output {
                         stream_output.write("<thinking>\r\n").await;
@@ -118,6 +123,12 @@ impl SendToLLM {
             }
 
             if let Some(token) = message_part.content.as_ref() {
+                let token = token.trim_matches('\n').to_owned();
+
+                if token.is_empty() {
+                    continue;
+                }
+
                 if thought {
                     if let Some(stream_output) = &self.stream_output {
                         stream_output.write("</thinking>\r\n\r\n").await;
@@ -130,8 +141,16 @@ impl SendToLLM {
                 }
             }
 
-            if let Some(FinishReason::ToolCalls) = next_chunk.choices[0].finish_reason {
-                finish_reason = FinishReason::ToolCalls;
+            match next_chunk.choices[0].finish_reason {
+                Some(FinishReason::ToolCalls) => {
+                    finish_reason = FinishReason::ToolCalls;
+                }
+                Some(FinishReason::Stop) => {
+                    if let Some(stream_output) = &self.stream_output {
+                        stream_output.write("\n").await;
+                    }
+                }
+                _ => (),
             }
         }
 
@@ -142,6 +161,7 @@ impl SendToLLM {
     }
 }
 
+#[derive(Clone)]
 pub struct SendToLLMHandle {
     sender: mpsc::Sender<Command>,
 }
@@ -169,9 +189,10 @@ impl SendToLLMHandle {
             model,
             tool_definitions,
         };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("Sending command to actor");
 
         recv.await
     }
@@ -184,7 +205,7 @@ struct LlmResponse {
     id: String,
     model: String,
     object: String,
-    timings: LlmResponseTimings,
+    timings: Option<LlmResponseTimings>,
     usage: Option<String>,
 }
 

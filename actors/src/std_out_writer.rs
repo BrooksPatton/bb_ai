@@ -33,12 +33,8 @@ impl StdOutWriter {
                         .write_all(content.as_bytes())
                         .await
                         .expect("writing content to standard out.");
-                    if let Err(error) = std_out.flush().await {
-                        eprintln!("{error:?}");
-                    }
-                    if let Err(error) = respond_to.send(()) {
-                        eprintln!("{error:?}");
-                    }
+                    std_out.flush().await.expect("Flushing stdout");
+                    respond_to.send(()).expect("Sending response from actor");
                 }
             }
         }
@@ -65,12 +61,11 @@ impl StdOutWriterHandle {
             respond_to,
             content: content.to_string(),
         };
-        if let Err(error) = self.sender.send(command).await {
-            eprintln!("{error:?}");
-        }
-        if let Err(error) = recv.await {
-            eprintln!("{error:?}");
-        }
+        self.sender
+            .send(command)
+            .await
+            .expect("Sending command to actor");
+        recv.await.expect("getting response from actor")
     }
 }
 

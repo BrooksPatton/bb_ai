@@ -49,6 +49,18 @@ impl Message {
             tool_calls: None,
         }
     }
+
+    pub fn new_assistant(content: impl Display) -> Self {
+        Self {
+            role: Role::Assistant,
+            content: Some(content.to_string()),
+            name: None,
+            reasoning: None,
+            reasoning_content: None,
+            tool_call_id: None,
+            tool_calls: None,
+        }
+    }
 }
 
 impl AddAssign for Message {
