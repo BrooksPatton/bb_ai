@@ -1,7 +1,7 @@
 use crate::{
     context_history::ContextHistoryHandle,
     send_to_llm::SendToLLMHandle,
-    tools::{ls::LSToolHandle, read_file::ReadFileToolHandle},
+    tools::{judge::JudgeToolHandle, ls::LSToolHandle, read_file::ReadFileToolHandle},
 };
 use colored::Colorize;
 use shared_types::message::Message;
@@ -20,6 +20,7 @@ struct Agent {
     read_file_tool: Option<ReadFileToolHandle>,
     model: String,
     name: String,
+    judge_tool: Option<JudgeToolHandle>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -33,6 +34,7 @@ impl Agent {
         read_file_tool: Option<ReadFileToolHandle>,
         model: String,
         name: String,
+        judge_tool: Option<JudgeToolHandle>,
     ) -> Self {
         Self {
             receiver,
@@ -43,6 +45,7 @@ impl Agent {
             read_file_tool,
             model,
             name,
+            judge_tool,
         }
     }
 
@@ -80,6 +83,9 @@ impl Agent {
         if let Some(ls) = self.ls_tool.as_ref() {
             tool_definitions.push(ls.get_definition().await);
         }
+        if let Some(judge_tool) = self.judge_tool.as_ref() {
+            tool_definitions.push(judge_tool.get_definition().await);
+        }
 
         loop {
             println!("{}", format!("Agent {} looping", self.name).blue());
@@ -97,16 +103,14 @@ impl Agent {
 
             match result.finish_reason {
                 crate::send_to_llm::FinishReason::Stop => {
-                    let last_message = self
-                        .context
-                        .get_last_with_content()
-                        .await
-                        .unwrap_or_else(|| Message::new_assistant(""));
+                    let deliverable = result.message.clone();
 
                     if let Some(judge) = &self.judge {
+                        println!("{}", format!("{deliverable}").blue());
+
                         let judge_result = judge
                             .prompt(format!(
-                                "full message history sent to agent: ```{:?}```\n\ndeliverable: ```{last_message}```",
+                                "full message history sent to agent: ```{:?}```\n\ndeliverable: ```{deliverable}```",
 
                                 self.context.get_all().await
                             ))
@@ -117,7 +121,7 @@ impl Agent {
 
                             return AgentResponse {
                                 finished: true,
-                                message: last_message,
+                                message: deliverable,
                             };
                         } else {
                             println!(
@@ -133,7 +137,7 @@ impl Agent {
 
                     return AgentResponse {
                         finished: true,
-                        message: last_message,
+                        message: deliverable,
                     };
                 }
                 crate::send_to_llm::FinishReason::ToolCalls => {
@@ -155,8 +159,7 @@ impl Agent {
                             self.context
                                 .push(Message::new_tool(read_file_result, tool_call.id.clone()))
                                 .await;
-                        }
-                        if let Some(ls) = self.ls_tool.as_ref()
+                        } else if let Some(ls) = self.ls_tool.as_ref()
                             && ls.get_name().await == *tool_call_name
                         {
                             let ls_result = match ls.ls(&tool_call.function.arguments).await {
@@ -166,6 +169,30 @@ impl Agent {
                             self.context
                                 .push(Message::new_tool(ls_result, tool_call.id.clone()))
                                 .await;
+                        } else if let Some(judge_tool) = self.judge_tool.as_ref()
+                            && judge_tool.get_name().await == *tool_call_name
+                        {
+                            let judge_result = match judge_tool
+                                .judge(&tool_call.function.arguments, tool_call.id.clone())
+                                .await
+                            {
+                                Ok(Some(message)) => message,
+                                Err(message) => message,
+                                Ok(None) => {
+                                    let agent_response = AgentResponse {
+                                        finished: true,
+                                        message: self
+                                            .context
+                                            .get_last_with_content()
+                                            .await
+                                            .unwrap_or_else(|| Message::new_assistant("")),
+                                    };
+
+                                    return agent_response;
+                                }
+                            };
+
+                            self.context.push(judge_result).await;
                         }
                     }
                 }
@@ -203,6 +230,7 @@ pub struct AgentHandle {
     sender: mpsc::Sender<Command>,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl AgentHandle {
     pub async fn new(
         send_to_llm: SendToLLMHandle,
@@ -212,6 +240,7 @@ impl AgentHandle {
         model: String,
         judge: Option<AgentHandle>,
         name: impl Display,
+        judge_tool: Option<JudgeToolHandle>,
     ) -> Self {
         let (sender, receiver) = mpsc::channel(8);
         let system_message = Message::new_system(system_prompt);
@@ -225,6 +254,7 @@ impl AgentHandle {
             read_file_tool,
             model,
             name.to_string(),
+            judge_tool,
         );
 
         context.push(system_message).await;

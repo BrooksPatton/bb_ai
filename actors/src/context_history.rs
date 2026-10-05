@@ -92,6 +92,7 @@ impl ContextHistory {
                     .content
                     .as_ref()
                     .is_some_and(|content| !content.is_empty())
+                    && message.role == shared_types::role::Role::Assistant
             })
             .cloned()
     }

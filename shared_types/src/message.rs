@@ -1,4 +1,5 @@
 use crate::{role::Role, tool_call::ToolCall};
+use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use std::{fmt::Display, ops::AddAssign};
 
@@ -97,6 +98,18 @@ impl AddAssign for Message {
 
 impl Display for Message {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.content)
+        if let Some(content) = &self.reasoning_content {
+            write!(
+                f,
+                "{}",
+                format!("<thinking>\n{content}\n</thinking>").bright_yellow()
+            )?;
+        }
+
+        if let Some(content) = &self.content {
+            write!(f, "{}", content.to_string().bright_white())?
+        }
+
+        Ok(())
     }
 }
